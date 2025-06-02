@@ -103,16 +103,15 @@ export default  function Calendar() {
   if(lessonsData){
     return (
     <>
-    <div className="m-auto w-[60vw] pt-7 flex flex-col  justify-center align-middle ">
+    <div className="m-auto w-[60vw]  pt-7 flex flex-col  justify-center align-middle ">
     <h1 className="text-center py-10 md:text-4xl font-bold" >{activeCourseName}</h1>
     <h2 className="text-center py-10 md:text-2xl font-bold" >Lezioni del corso:</h2>
-    <SearchField  setSearchedData={setSearchedData} searchField="firstname" startingData={lessonsData.allMonthLessons} searchLabel="First Name"/>
-    <SearchField  setSearchedData={setSearchedData} searchField="lastname" startingData={lessonsData.allMonthLessons} searchLabel="Last Name"/>
+    <SearchField  setSearchedData={setSearchedData} searchField="modulename" startingData={lessonsData.allMonthLessons} searchLabel="Module"/>
     <div className="flex justify-center items-center space-x-4 mt-6">
     <div className="flex justify-center items-center space-x-4 mt-6">
-    <Button styleType={(lessonsData.previous) ? "standardTiny":"disabled"} onClick={handleGoPrevious}>&#9664;</Button>
+    <Button styleType={(lessonsData.previous) ? "standardTiny":"disabledTiny"} onClick={handleGoPrevious}>&#9664;</Button>
     <span className="text-lg font-medium text-gray-700">{monthName[reqMonth]} {reqYear}</span>
-    <Button styleType={(lessonsData.next) ? "standardTiny":"disabled"}  onClick={handleGoNext}>&#9654;</Button>
+    <Button styleType={(lessonsData.next) ? "standardTiny":"disabledTiny"}  onClick={handleGoNext}>&#9654;</Button>
     </div>
     </div>
     {errorAddingLesson && <div className="m-auto text-xl">Error in adding the lesson</div> }

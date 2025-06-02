@@ -19,6 +19,7 @@ import UsefulLinks from './Static pages/UsefulLinks'
 import Students from './pages/Students';
 import Professors from './pages/Professors';
 import Calendar from './pages/Calendar';
+import UserAccount from './pages/UserAccount';
 
 import './App.css'
 
@@ -36,6 +37,7 @@ function AppRoutes() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/devpage" element={<DevPage />} />
+        <Route path="/account" element={<UserAccount />} />
         <Route path="courses" element={<Courses />} />
         <Route path="/students" element={<Students />} />
         <Route path="/professors" element={<Professors />} />

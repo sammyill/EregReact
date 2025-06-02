@@ -55,7 +55,6 @@ export default  function Students() {
     <div className="m-auto w-[60vw] pt-7 flex flex-col  justify-center align-middle ">
     <h1 className="text-center py-10 md:text-4xl font-bold" >{activeCourseName}</h1>
     <h2 className="text-center py-10 md:text-2xl font-bold" >Students :</h2>
-    <SearchField  setSearchedData={setSearchedData} searchField="firstname" startingData={modulesData} searchLabel="First Name"/>
     <SearchField  setSearchedData={setSearchedData} searchField="lastname" startingData={modulesData} searchLabel="Last Name"/>
     <div className="m-auto  pt-7 flex flex-row flex-wrap justify-center align-middle ">
         {searchedData.map((student)=><UserCard
