@@ -23,7 +23,7 @@ export default  function Home() {
   const [errorAddinModule,setErrorAddingModule]=useState(false);
   const {activeCourseId,activeCourseName,activeCourseStart,activeCourseEnd,token}=useContext(EregContext);
  
-   localStorage.clear()
+   //localStorage.clear()
   useEffect(() => {
     async function fetchData() {
       setIsLoading(true)

@@ -25,9 +25,11 @@ import './App.css'
 
 function AppRoutes() {
   const { isLoggedIn } = useContext(EregContext);
+  console.log(isLoggedIn)
 
   return (
     <>
+    
       {!isLoggedIn ?(<Routes>
         <Route path="*" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />

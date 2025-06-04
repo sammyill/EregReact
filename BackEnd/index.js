@@ -11,6 +11,8 @@ const { path } = require('express/lib/application')
 const defineUserRoutes = require('./usercalls');
 const defineModuleRoutes = require('./modulecalls');
 const definelectureRoutes = require('./lecturecalls');
+const defineCoursesRoutes = require('./coursecalls');
+const defineAdminUserRoutes = require('./adminusercalls');
 var jsonParser = bodyParser.json();
 
 //generate a secretkey for jwt
@@ -28,6 +30,8 @@ app.use(cors(corsOptions));
 defineModuleRoutes(app);
 definelectureRoutes(app);
 defineUserRoutes(app);
+defineCoursesRoutes(app);
+defineAdminUserRoutes(app);
 
 //LASCIARE PER ORA CREAZIONE DI UN UTENTE DI PROVA
 app.post('/createtestuser',/*authenticateToken ,*/jsonParser, async (req, res) => {
