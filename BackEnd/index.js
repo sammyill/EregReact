@@ -120,3 +120,21 @@ app.get('/authorizationmiddleexttwo/:idcourse', authenticateToken,(req,res,next)
       res.json({ error: true, errormessage: "GENERIC_ERROR" });
   }
 })
+
+app.use((req, res, next) => {
+  res.status(404).json({
+    success: false,
+    message: 'Route not found or method not allowed.'
+  });
+});
+
+app.use((err, req, res, next) => {
+  console.error('Global error:', err.stack);
+
+  res.status(500).json({
+    success: false,
+    message: 'Internal Server Error.',
+    error: process.env.NODE_ENV === 'development' ? err.message : undefined
+  });
+});
+

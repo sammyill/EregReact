@@ -60,8 +60,15 @@ function initCourseRoutes(app) {
                 res.json({ error: true, errormessage: "INVALID COURSE" });
                 return;
             }
-            const [courseData]=await con.execute(`select * from courses where id=?`,[courseid])             
-            res.json({error:false,courseData:courseData});
+            const [courseData]=await con.execute(`select * from courses where id=?`,[courseid])    
+            const [courseUsers]=await con.execute(`select u.firstname,u.lastname ,u.email,r.name as rolename,r.id as roleid 
+                                                from users u 
+                                                inner join users_roles_courses urc on urc.id_user =u.id
+                                                inner join courses c on urc.id_course =c.id
+                                                inner join roles r on r.id =urc.id_role
+                                                where c.id=? 
+                                                order by r.id desc`,[courseid])         
+            res.json({error:false,courseData:courseData,courseUsers:courseUsers});
         } catch (err) {
             console.log("Getalllessons Error:" + err);
             res.json({ error: true, errormessage: "GENERIC_ERROR" });
@@ -157,6 +164,106 @@ function initCourseRoutes(app) {
             res.json({ error: true, errormessage: "GENERIC_ERROR" });
         }
     })
+
+    //ADMIN ROUTES
+        /**
+         * Connect a new user to the course
+         * courseid,userid and roleid are required
+         */
+    app.post('/connectuser', authenticateToken, async (req, res) => {
+        let idcourse = req.body.idcourse;
+        let iduser = req.body.iduser;
+        let idrole=req.body.idrole
+        try {
+            let validation = await con.query(`select id from courses where id = ?`, [idcourse]);
+            if (validation[0].length < 1) {
+                res.json({ error: true, errormessage: "INVALID COURSE ID" });
+                return;
+            }
+            validation = await con.query(`select id from users where id = ?`, [iduser]);
+            if (validation[0].length < 1) {
+                res.json({ error: true, errormessage: "INVALID USER ID" });
+                return;
+            }
+            validation = await con.query(`select id from roles where id = ?`, [idrole]);
+            if (validation[0].length < 1) {
+                res.json({ error: true, errormessage: "INVALID ROLE ID" });
+                return;
+            }
+
+            const data = await con.execute(`INSERT INTO ereg.users_roles_courses
+                                        (id_user, id_role, id_course)
+                                        VALUES(?,?,?);`, [iduser,idrole,idcourse]);
+            res.json({error:false , data:data, message:"OPERATION COMPLETED"});
+        } catch (err) {
+            console.log("Deletelesson Error: " + err);
+            res.json({ error: true, errormessage: "GENERIC_ERROR" });
+        }
+    })
+
+    /**
+     * change the role of a user in the course
+     */
+    app.patch('/changeuserrole/:iduser/:idrole/:idcourse', authenticateToken, async (req, res) => {
+        let idcourse = req.body.idcourse;
+        let iduser = req.params.iduser;
+        let idrole=req.params.idrole
+        try {
+            let validation = await con.query(`select id from courses where id = ?`, [idcourse]);
+            if (validation[0].length < 1) {
+                res.json({ error: true, errormessage: "INVALID COURSE ID" });
+                return;
+            }
+            validation = await con.query(`select id from users where id = ?`, [iduser]);
+            if (validation[0].length < 1) {
+                res.json({ error: true, errormessage: "INVALID USER ID" });
+                return;
+            }
+            validation = await con.query(`select id from roles where id = ?`, [idrole]);
+            if (validation[0].length < 1) {
+                res.json({ error: true, errormessage: "INVALID ROLE ID" });
+                return;
+            }
+
+            const data = await con.execute(`UPDATE ereg.users_roles_courses
+                                        SET id_role=? 
+                                        WHERE id_user=? AND id_course=?;`, [idrole,iduser,idcourse]);
+            res.json({error:false , data:data, message:"OPERATION COMPLETED"});
+        } catch (err) {
+            console.log("Deletelesson Error: " + err);
+            res.json({ error: true, errormessage: "GENERIC_ERROR" });
+        }
+    })
+
+    /**
+     * Remove(unlink) the association between a user and a course
+     */
+    app.delete('/unlinkuser/:iduser/:idcourse', authenticateToken, async (req, res) => {
+        let idcourse = req.body.idcourse;
+        let iduser = req.params.iduser;
+        try {
+            let validation = await con.query(`select id from courses where id = ?`, [idcourse]);
+            if (validation[0].length < 1) {
+                res.json({ error: true, errormessage: "INVALID COURSE ID" });
+                return;
+            }
+            validation = await con.query(`select id from users where id = ?`, [iduser]);
+            if (validation[0].length < 1) {
+                res.json({ error: true, errormessage: "INVALID USER ID" });
+                return;
+            }
+
+            const data = await con.execute(`DELETE FROM ereg.users_roles_courses
+                                           WHERE id_user=?  AND id_course=?;`, 
+                                           [iduser,idcourse]);
+            res.json({error:false , data:data, message:"OPERATION COMPLETED"});
+        } catch (err) {
+            console.log("Deletelesson Error: " + err);
+            res.json({ error: true, errormessage: "GENERIC_ERROR" });
+        }
+    })
+
+
 
 
 }
