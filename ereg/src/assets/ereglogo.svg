@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="100mm"
+   height="50mm"
+   viewBox="0 0 100 50"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="ereglogo.svg"
+   inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="2.1563542"
+     inkscape:cx="139.81933"
+     inkscape:cy="102.71967"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1">
+    <linearGradient
+       id="linearGradient1"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop1" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop2" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient1"
+       id="linearGradient2"
+       x1="40.139867"
+       y1="25.407558"
+       x2="68.135117"
+       y2="25.407558"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <g
+     id="layer1">
+    <rect
+       style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:3.077;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       id="rect1"
+       width="91.89917"
+       height="43.766403"
+       x="4.2000961"
+       y="3.2615733" />
+    <rect
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1.87377;stroke-dasharray:none;stroke-opacity:1"
+       id="rect2"
+       width="89.974419"
+       height="7.65276"
+       x="5.0980377"
+       y="3.6441798" />
+    <text
+       xml:space="preserve"
+       style="font-size:12.1349px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3.22481;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       x="38.962803"
+       y="14.571095"
+       id="text2"
+       transform="scale(0.93028614,1.0749381)"><tspan
+         id="tspan2"
+         style="stroke-width:3.22481;fill:#000000;fill-opacity:1"
+         x="38.962803"
+         y="14.571095" /><tspan
+         style="stroke-width:3.22481;fill:#000000;fill-opacity:1"
+         id="tspan3"
+         x="38.962803"
+         y="29.739721">ER3G</tspan></text>
+    <path
+       d="m 70.481487,20.243366 -0.10081,13.97115 a 7.5734975,23.268402 89.59031 0 0 14.31052,-6.81542 7.5734975,23.268402 89.59031 0 0 -14.20966,-7.15573 z"
+       style="fill:#fff0f0;stroke:#000000;stroke-width:5.64441;stroke-linecap:round;stroke-linejoin:round;fill-opacity:1"
+       id="path5" />
+    <path
+       d="m 30.48902,34.279676 v -14.1529 a 7.671973,22.542719 89.269638 0 0 -13.81646,6.97851 7.671973,22.542719 89.269638 0 0 13.81646,7.17439 z"
+       style="fill:#ffffff;stroke:#000000;stroke-width:5.5917;stroke-linecap:round;stroke-linejoin:round;fill-opacity:1"
+       id="path5-8" />
+  </g>
+</svg>

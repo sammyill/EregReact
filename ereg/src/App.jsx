@@ -20,6 +20,7 @@ import Students from './pages/Students';
 import Professors from './pages/Professors';
 import Calendar from './pages/Calendar';
 import UserAccount from './pages/UserAccount';
+import AdmincoursesPage from './pages/AdminCoursesPage';
 
 import './App.css'
 
@@ -38,6 +39,7 @@ function AppRoutes() {
       <Header/>
       <Routes>
         <Route path="/" element={<Home />} />
+         <Route path="/admincoursespage" element={<AdmincoursesPage />} />
         <Route path="/devpage" element={<DevPage />} />
         <Route path="/account" element={<UserAccount />} />
         <Route path="courses" element={<Courses />} />
@@ -48,6 +50,7 @@ function AppRoutes() {
         <Route path="/privacy" element={ <UsefulLinks content={privacyPolicy} title="Privacy Policy"/>} />
         <Route path="/terms" element={<UsefulLinks content={termsOfService} title="Terms of Service"/>} />
         <Route path="/login" element={<Navigate to="/" replace />} /> 
+        <Route path="/errorpage" element={<ErrorPage />} />
         <Route path="*" element={<ErrorPage />} />
       </Routes>
       <Footer/>

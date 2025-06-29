@@ -36,7 +36,7 @@ function autCheck(req,res,next,permits){
   
 function initAdminUserRoutes(app) {
     app.get('/getallusers/', authenticateToken, async (req, res) => {
-        let idcourse = req.params.idcourse;
+       
         let data
         let role=req.user.roles.find(rlc=>rlc.idcourse=idcourse).idrole;
         try {

@@ -47,6 +47,7 @@ function initLessonRoutes(app) {
         let month=req.params.month;
         let year=req.params.year;
         let idcourse=req.params.idcourse;
+       
         try {
             //getting alle the lessond of the requested month
             const [allMonthLesson] = await con.execute(`select l.id as idlesson,m.name as modulename,l.notes as notes,u.firstname ,u.lastname ,l.begindate,l.enddate,l.completed as completionstatus from lessons l 
@@ -56,6 +57,7 @@ function initLessonRoutes(app) {
                                                     inner join users u on u.id=um.id_user 
                                                     where c.id= ? and month (l.begindate)= ? and year(l.begindate)=?
                                                     order by l.begindate asc`,[idcourse,month,year]);
+           
             //getting the the first lessond of the course by date
             const [firstdate] = await con.execute(`select l.begindate from lessons l 
                                             inner join modules m on l.id_modules =m.id
@@ -76,12 +78,19 @@ function initLessonRoutes(app) {
                                         inner join users_modules um on um.id_module =m.id
                                         inner join users u on um.id_user =u.id
                                         where um.permit =2 and m.id_course =? `,[idcourse]) ;
+                                         
             let previousDate=new Date(firstdate[0]["begindate"]);
             let nextDate=new Date(lastdate[0]["begindate"]);
-            let firstLesson=new Date(allMonthLesson[0]["begindate"]);
-            let lastLesson=new Date(allMonthLesson[allMonthLesson.length-1]["begindate"])
-            let previous=(previousDate<firstLesson) ? true:false;
+           
+            let firstLesson=allMonthLesson.length>0 ? new Date(allMonthLesson[0]["begindate"]) :new Date(`${year}-${month<10? `0${month}`:month}-01T00:00:00`) ;
+            let lastLesson=allMonthLesson.length>0 ? new Date(allMonthLesson[allMonthLesson.length-1]["begindate"]): new Date(`${year}-${month<10? `0${month}`:month}-28T00:00:00`);
+            console.log(lastLesson)
+            console.log(nextDate)
+            console.log(previousDate)
+            console.log(firstLesson)
+            let previous=(previousDate<firstLesson ) ? true:false;
             let next=(nextDate>lastLesson) ? true:false;
+           
             const data={
                 allMonthLessons: allMonthLesson,
                 previous: previous,
