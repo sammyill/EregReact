@@ -21,6 +21,7 @@ import Professors from './pages/Professors';
 import Calendar from './pages/Calendar';
 import UserAccount from './pages/UserAccount';
 import AdmincoursesPage from './pages/AdminCoursesPage';
+import AdminCourseDetails from './pages/AdminCourseDetails';
 
 import './App.css'
 
@@ -39,6 +40,7 @@ function AppRoutes() {
       <Header/>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/admincoursedetail" element={<AdminCourseDetails />} />
          <Route path="/admincoursespage" element={<AdmincoursesPage />} />
         <Route path="/devpage" element={<DevPage />} />
         <Route path="/account" element={<UserAccount />} />

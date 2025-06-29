@@ -15,7 +15,7 @@ export default function SimpleCard({cardLabel,elementID,elementStatus,navigateTo
     const navigate=useNavigate()
     
     function handleCourseChange(elementID){
-      navigate(navigateToPage,{id:elementID});
+      navigate(navigateToPage,{ state: { id: elementID } });
     }
     return (
     <div className="flex flex-col justify-center align-middle border border-gray-200 rounded-md overflow-hidden shadow-sm bg-white mb-2 w-[60vw]">

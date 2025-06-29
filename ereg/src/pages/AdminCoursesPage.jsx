@@ -31,7 +31,8 @@ export default function AdmincoursesPage() {
       {courses.map((course)=>
       <SimpleCard  cardLabel={`${course.name} ${course.startyear}-${course.endyear}`}   
       elementID={course.id}  
-      elementStatus={course.status===1 ? "active":"inactve"}/>
+      elementStatus={course.status===1 ? "active":"inactve"}
+      navigateToPage="/admincoursedetail"/>
       )}
       <SimpleCard   cardLabel="Industrial Software  Developer 2029-2032"   elementID="2"  elementStatus="active"/>
       <SimpleCard  cardLabel="Mario Sgravola Mario.Scravola@gmail.com" elementID="2" elementStatus="inactve" />
