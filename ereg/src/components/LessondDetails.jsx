@@ -1,14 +1,37 @@
-import React from 'react';
+import { useEffect,useState } from "react";
+import { fetchHelper } from "../utilities";
 
-const LessonPage = ({ moduleName, lessonDate, startTime, endTime, students, onGoBack }) => {
+export default function LessonPage  ({ courseID,lessonId, onGoBack }) {
+  const [lessonDetails,setlessonDetails]=useState(null);
+  const [students,setStudents]=useState(null);
+ 
+  useEffect(()=>{
+  async function fetchData() {
+      const data = await fetchHelper('GET',`/getalesson/${courseID}/${lessonId}`,token,"none");
+      console.log(data)
+      setlessonDetails(data.lessondetails);
+      setStudents(data.students)
+    }
+    fetchData();
+  },[])
+  function handleNotes(e){
+    //aggiungere fetch che aggiorna le note
+    setlessonDetails((prev)=>{
+      return{
+        ...prev,
+
+      }
+    })
+  }
+  if(!lessonDetails ) return(<p className="h-[500px]">Error,Contact your coordinator or an admin</p>)
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       {/* Lesson Description */}
       <div className="bg-white rounded-2xl shadow p-4 space-y-2 text-center">
-        <h2 className=" md:text-2xl text-base font-semibold text-gray-800">{moduleName}</h2>
+        <h2 className=" md:text-2xl text-base font-semibold text-gray-800">{lessonDetails.modulename}</h2>
         <div className="text-gray-600 text-sm md:text-base">
-          <p>Date: <span className="font-medium">{lessonDate}</span></p>
-          <p>Time: <span className="font-medium">{startTime}</span> - <span className="font-medium">{endTime}</span></p>
+          <p>Begin: <span className="font-medium">{lessonDetails.begindate}</span></p>
+          <p>Eng: <span className="font-medium">{lessonDetails.enddate}</span></p>
         </div>
       </div>
 
@@ -20,6 +43,8 @@ const LessonPage = ({ moduleName, lessonDate, startTime, endTime, students, onGo
           rows="4"
           className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
           placeholder="Write lesson notes here..."
+          value={lessonDetails.notes || ""}
+          onChange={(e)=>handleNotes(e)}
         ></textarea>
       </div>
 
@@ -50,24 +75,6 @@ const LessonPage = ({ moduleName, lessonDate, startTime, endTime, students, onGo
       </div>
     </div>
   );
+  
 };
 
-// Dummy data for testing
-const dummyStudents = [
-  { name: "Alice Johnson" },
-  { name: "Bob Smith" },
-  { name: "Charlie Zhang" },
-];
-
-const App = () => (
-  <LessonPage
-    moduleName="Mathematics A1"
-    lessonDate="2025-06-03"
-    startTime="10:00"
-    endTime="11:30"
-    students={dummyStudents}
-    onGoBack={() => alert('Going back to calendar...')}
-  />
-);
-
-export default App;

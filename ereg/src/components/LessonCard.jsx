@@ -26,6 +26,7 @@ const resoultMessage={
 }
 
 export default function LessonCard({handleRequestDetails,lessonId,lessonStart,lessonModule,lessonEnd,lessonProfFN,lessonProfLN,setCalendarReload}){
+  //console.log(lessonId)
   const fullname=fullName(lessonProfFN,lessonProfLN)
   const lstart=new Date(lessonStart);
   const lend=new Date(lessonEnd)
@@ -109,7 +110,7 @@ return (
    </div>}
    {userMode==="standard" &&
     <div className="flex flex-row justify-center">
-    <Button styleType="standardIntegrated" onClick={handleRequestDetails}>Details</Button>
+    <Button styleType="standardIntegrated" onClick={()=>handleRequestDetails(lessonId)}>Details</Button>
     <Button styleType="standardIntegrated" onClick={()=>handleUserMode("edit")}>Edit</Button>
     <Button styleType="dangerIntegrated" onClick={()=>handleUserMode("delete")}>Delete</Button>
    </div>}

@@ -7,6 +7,7 @@ import Button from "../components/Button";
 import FormWrapper from "../components/FormWrapper";
 import InputField from "../components/InputField";
 import InputSelect from "../components/InputSelect";
+import LessonPage from "../components/LessondDetails";
 import {beginDate,endDate } from "../components/formsdasates";
 const todayDate=new Date();
 const monthName=["","Jen","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -27,6 +28,7 @@ export default  function Calendar() {
   const {activeCourseId,activeCourseName,token}=useContext(EregContext);
    const [newLesson,setNewLesson]=useState(false);
    const [errorAddingLesson,setErrorAddingLesson]=useState(false);
+  const[isDetailsActive,setIsDetailsActive]=useState(false)
   const todayMonth=todayDate.getMonth();
   const todayYear=todayDate.getFullYear();
   // /getalllessons/:idcourse/:month/:year
@@ -54,9 +56,11 @@ export default  function Calendar() {
     
   }
 
-  function handleRequestDetails(){
-
+  function handleRequestDetails(lessonId){
+     console.log("lessonID:",lessonId)
+     setIsDetailsActive(true)
   }
+
   const handleSubmit =async (event) => {
     event.preventDefault()
     console.log(event.target.beginDate.value)
@@ -102,7 +106,7 @@ export default  function Calendar() {
     }
     fetchData();
   }, [calendarReload,activeCourseId,reqMonth,reqYear]);
-  
+  if(isDetailsActive) return(<p>prova</p>)
   //console.log(`La mia data è Mese ${monthName[reqMonth]} Anno: ${reqYear}`)
   if(lessonsData){
     return (

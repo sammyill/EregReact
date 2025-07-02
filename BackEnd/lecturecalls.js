@@ -112,21 +112,39 @@ function initLessonRoutes(app) {
         let lessonid = req.params.idlesson;
         try {
             //the lesson doens't exist 
-            let validation = await con.query(`select id from lessons where id = ?`, [patchid]);
+            let validation = await con.query(`select id from lessons where id = ?`, [lessonid]);
             if (validation[0].length < 1) {
                 res.json({ error: true, errormessage: "INVALID_LESSON_ID" });
                 return;
             }
             //getting alle the lesson informations
-            const [lesson] = await con.execute(`select l.id as idlesson,l.title,l.description ,l.begindate,l.enddate,m.name as modulename,u.firstname,u.lastname,u.id as idowner from lessons l 
+            const [lesson] = await con.execute(`select l.id as idlesson,l.notes,l.begindate,l.enddate,m.name as modulename,u.firstname,u.lastname,u.id as idowner from lessons l 
                                                 inner join modules m on m.id=l.id_modules 
                                                 inner join users_modules um on l.id_modules =um.id_module and um.permit =2
                                                 inner join users u on um.id_user =u.id 
                                                  where l.id=?`,[lessonid]);
+            /* NON SERVE PIU'
+            const nowDate=new Date();
+            console.log(nowDate)
+            console.log(lesson[0].enddate)
+            if(nowDate>lesson[0].enddate){
+
+            }
+            */
+            const [students]=await con.execute(`SELECT u.firstname,u.lastname,aul.entryhour AS entry_hour,aul.exithour AS exit_hour
+                                        FROM lessons l
+                                        INNER JOIN modules m ON m.id = l.id_modules
+                                        INNER JOIN courses c ON c.id = m.id_course
+                                        INNER JOIN users_roles_courses urc ON urc.id_course = c.id AND urc.id_role = 1
+                                        INNER JOIN users u ON u.id = urc.id_user AND u.status = 1
+                                        LEFT JOIN attendance_users_lessons aul 
+                                        ON aul.id_user = u.id AND aul.id_lesson = l.id
+                                        WHERE l.id = ?;`,[lessonid])
+            /* NON SERVE PIU'
             //geting the entry and exit  hours of the students that attended the course
             const [completionist] = await con.execute(`select u.firstname,u.lastname,aul.entryhour,aul.exithour from lessons l
-                                                       inner join attendance_users_lessons aul on aul.id_lessons =l.id 
-                                                       inner join users u on aul.id_users =u.id
+                                                       inner join attendance_users_lessons aul on aul.id_lesson =l.id 
+                                                       inner join users u on aul.id_user =u.id
                                                        where l.id=1`,[lessonid]);
             //getting the students that need to attend the course
             const [futurecompletionistt] = await con.execute(`select u.firstname,u.lastname,u.id as iduser from lessons l 
@@ -136,12 +154,19 @@ function initLessonRoutes(app) {
                                                             inner join users u on urc.id_user =u.id 
                                                             where l.id=? and urc.id_role =1 and u.status =1`,[lessonid]);
             const [allmodules]=await con.execute(`select m.id as idmodule,m.name as modulename from modules m 
-                                                   where m.id_course =?`,[idcourse])             
+                                                   where m.id_course =?`,[idcourse])    
+
             const data={
                 lessondetails: lesson,
+                students: students,
                 studLDone: completionist,
                 studLFuture: futurecompletionistt,
                 allmodules:allmodules
+            }
+                */
+            const data={
+                lessondetails: lesson,
+                students: students,
             }
             res.json(data);
         } catch (err) {
