@@ -165,9 +165,10 @@ function initLessonRoutes(app) {
             }
                 */
             const data={
-                lessondetails: lesson,
+                lessondetails: lesson[0],
                 students: students,
             }
+            console.log(data)
             res.json(data);
         } catch (err) {
             console.log("Getalllessons Error:" + err);
@@ -282,7 +283,48 @@ function initLessonRoutes(app) {
         }
 
     })
+  
+    app.patch('/updatelessonnotes/:idcourse/:idlesson', jsonParser, authenticateToken, async (req, res) => {
+        let courseid=req.params.idcourse
+        let patchid = req.params.idlesson;
+        let rqbody = req.body;
+        let iduser=req.user.iduser
 
+ 
+        try {
+          //looking for the enddate and the id of the propietary of the course
+            let validation = await con.query(`select l.notes,l.enddate ,um.id_user as idowner from lessons l
+                                            inner  join users_modules um on um.id_module =l.id_modules
+                                            inner join users u on um.id_user =u.id
+                                            where l.id ? and um.permit =2`,
+                                               [patchid]);
+            //the lesson doens't exist  or has already started
+            if (validation[0].length < 1) {
+                res.json({ error: true, errormessage: "LESSON_DOESNT_EXIST_OR_HARS_ALDREADY_STARTED" });
+                return;
+            }
+            const date = new Date()
+            //the lesson has already ended
+            if(date>validation[0]["enddate"]){
+            res.json({ error: true, errormessage: "THE LESSON HAS ALREADY ENDED " });
+                return;
+            }
+            if(parseInt(iduser)!==parseInt(validation[0]["idowner"])){
+                res.json({ error: true, errormessage: "YOU ARE NOT THE OWNER,NOT ALLOWED" });
+                return;
+            }
+
+            //update lesson
+            const data = await con.execute(`update lessons set notes = ? where id = ?`,
+                                                 [rqbody.notes, patchid]);
+            res.json({error:false,data:data});
+
+        } catch (err) {
+            console.log("Updatelesson Error: " + err);
+            res.json({ error: true, errormessage: "GENERIC_ERROR" });
+        }
+
+    })
 
     /**
      * A lesson can be delete only is it hasn't haleady started
@@ -306,6 +348,197 @@ function initLessonRoutes(app) {
         }
     })
 
+    
+    //starting the lesson and connecting all the student
+    app.post('/studentattend/:idcourse/:idlesson/:idstudent', jsonParser, authenticateToken, async (req, res) => {
+        let idlesson=req.params.idlesson;
+        let idstudent=req.params.idstudent
+        let iduser=req.user.iduser
+        let rqbody = req.body;
+        try {
+
+            //looking if the student is enrollend in the course
+            const validation = await con.query(`select urc.id_user as iduser,l.begindate ,l.enddate  from lessons l 
+                                                inner join modules m on l.id_modules =m.id
+                                                inner join users_roles_courses urc on urc.id_course =m.id_course
+                                                where urc.id_user =? and urc.id_role =1 and l.id=?`, [rqbody.iduser,rqbody.idlesson]);
+            if (validation[0].length < 1) {
+                res.json({ error: true, errormessage: "THE USER CANNOT ATTEND THIS LESSON" });
+                return;
+            }
+            const date = new Date()
+            //if the lesson hasn't already started
+            if(date<validation[0]["begindate"]){
+                res.json({ error: true, errormessage: "THE LESSON HASN'T ALREADY STARTED" });
+                return;
+            }
+            if(date>validation[0]["enddate"]){
+                res.json({ error: true, errormessage: "THE LESSON HAR ALREADY ENDED" });
+                return;
+            }
+            //looking for the enddate and the id of the propietary of the course
+            const validateowner = await con.query(`select um.id_user as idowner from lessons l
+                                            inner  join users_modules um on um.id_module =l.id_modules
+                                            inner join users u on um.id_user =u.id
+                                            where l.id ? and um.permit =2`,
+                                               [idlesson]);
+ 
+            //the user trying to end the lesson is not the owner of the lesson
+            if(parseInt(iduser)!==parseInt(validateowner[0]["idowner"])){
+                res.json({ error: true, errormessage: "YOU ARE NOT THE OWNER,NOT ALLOWED" });
+                return;
+            }
+
+            //Conncting alle the student to the lesson ans set enty and exit to null
+            const data = await con.execute(`INSERT INTO attendance_users_lessons
+                                           (id_user, id_lesson, entryhour, exithour)
+                                            VALUES(?, ?, ?, NULL); `, 
+                                            [idstudent,idlesson,date]);
+            
+            res.json(data);
+        } catch (err) {
+            console.log("Deletelesson Error: " + err);
+            res.json({ error: true, errormessage: "GENERIC_ERROR" });
+        }
+    })
+    
+    // DERPCATA
+    //DOVREBBE FUNZIONARE,DA CONTROLLARE
+    //register the presence of a student to the lesson,also create the presence
+    app.post('/createattendance', authenticateToken, async (req, res) => {
+        try {
+            //looking if the student is enrollend in the course
+            const validation = await con.query(`select urc.id_user as iduser,l.begindate begindate  from lessons l 
+                                                inner join modules m on l.id_modules =m.id
+                                                inner join users_roles_courses urc on urc.id_course =m.id_course
+                                                where urc.id_user =? and urc.id_role =1 and l.id=?`, [rqbody.iduser,rqbody.idlesson]);
+            if (validation[0].length < 1) {
+                res.json({ error: true, errormessage: "THE USER CANNOT ATTEND THIS LESSON" });
+                return;
+            }
+            const date = new Date()
+            //if the lesson hasn't already started
+            if(date<validation[0]["begindate"]){
+                res.json({ error: true, errormessage: "THE LESSON HASN'T ALREADY STARTED" });
+                return;
+            }
+            
+            //creating the attendance to the lesson
+            const data = await con.execute(`UPDATE attendance_users_lessons 
+                                          set entryhour=?
+                                          where id_user=? and  id_lesson=?;`, 
+                                          [rqbody.entryhour,rqbody.iduser,rqbody.idlesson]);
+            res.json(data);
+        } catch (err) {
+            console.log("Deletelesson Error: " + err);
+            res.json({ error: true, errormessage: "GENERIC_ERROR" });
+        }
+    });
+
+     //starting the lesson and connecting all the student
+    app.patch('/studenleave/:idcourse/:idlesson/:idstudent', jsonParser, authenticateToken, async (req, res) => {
+        let idlesson=req.params.idlesson;
+        let idstudent=req.params.idstudent
+        let iduser=req.user.iduser
+        let rqbody = req.body;
+        try {
+
+            //looking if the student is enrollend in the course
+            const validation = await con.query(`select urc.id_user as iduser,l.begindate ,l.enddate  from lessons l 
+                                                inner join modules m on l.id_modules =m.id
+                                                inner join users_roles_courses urc on urc.id_course =m.id_course
+                                                where urc.id_user =? and urc.id_role =1 and l.id=?`, [rqbody.iduser,rqbody.idlesson]);
+            if (validation[0].length < 1) {
+                res.json({ error: true, errormessage: "THE USER CANNOT ATTEND THIS LESSON" });
+                return;
+            }
+            const date = new Date()
+            //if the lesson hasn't already started
+            if(date<validation[0]["begindate"]){
+                res.json({ error: true, errormessage: "THE LESSON HASN'T ALREADY STARTED" });
+                return;
+            }
+            if(date>validation[0]["enddate"]){
+                res.json({ error: true, errormessage: "THE LESSON HAR ALREADY ENDED" });
+                return;
+            }
+            const validatepresence = await con.query(`select aul.entryhour as entryhour,l.enddate as enddate from attendance_users_lessons aul 
+                                                inner join lessons l on l.id=aul.id_lesson
+                                                where aul.id_user =? and aul.id_lesson =?`,
+                                                [rqbody.iduser,rqbody.idlesson]);
+            if (validatepresence[0].length < 1 || validatepresence[0]["entryhour"]==null ) {
+                res.json({ error: true, errormessage: "THE USER HASN'ALREADY ATTEND THE LESSON" });
+                return;
+            }
+            if(validatepresence[0]["entryhour"]>date){
+                 res.json({ error: true, errormessage: "ERROR ENTRI DATE IS BIGGER THAN LEAVING DATE,THE STUDENT CANNO LEAVE BEFORE ATTENDING A LESSON " });
+                return; 
+            }
+
+            //looking for the enddate and the id of the propietary of the course
+            const validateowner = await con.query(`select um.id_user as idowner from lessons l
+                                            inner  join users_modules um on um.id_module =l.id_modules
+                                            inner join users u on um.id_user =u.id
+                                            where l.id ? and um.permit =2`,
+                                               [idlesson]);
+ 
+            //the user trying to end the lesson is not the owner of the lesson
+            if(parseInt(iduser)!==parseInt(validateowner[0]["idowner"])){
+                res.json({ error: true, errormessage: "YOU ARE NOT THE OWNER,NOT ALLOWED" });
+                return;
+            }
+
+            //Conncting alle the student to the lesson ans set enty and exit to null
+            const data = await con.execute(`UPDATE ereg.attendance_users_lessons
+                                        SET exithour=?
+                                        WHERE id_user=? AND id_lesson=?;`, 
+                                            [date,idstudent,idlesson]);
+            
+            res.json(data);
+        } catch (err) {
+            console.log("Deletelesson Error: " + err);
+            res.json({ error: true, errormessage: "GENERIC_ERROR" });
+        }
+    })
+    
+
+
+      //DEPRECATA
+    //DOVREBBE ESSERE FINITA,DA PROVARE
+    //register the hourse of leaving the lesson early
+    app.patch('/leavinglesson/:idcourse', authenticateToken, async (req, res) => {
+
+        let rqbody = req.body;
+        try {
+            //looking if the student is attending the lessong
+            const validation = await con.query(`select aul.entryhour as entryhour,l.enddate as enddate from attendance_users_lessons aul 
+                                                inner join lessons l on l.id=aul.id_lesson
+                                                where aul.id_user =? and aul.id_lesson =?`,
+                                                [rqbody.iduser,rqbody.idlesson]);
+            if (validation[0].length < 1) {
+                res.json({ error: true, errormessage: "THE USER HASN'ALREADY ATTEND THE LESSON" });
+                return;
+            }
+            const date = new Date()
+            //the lesson has already ended
+            if(date>validation[0]["enddate"]){
+                res.json({ error: true, errormessage: "THE LESSON HAS ALREADY ENDED " });
+                return;
+            }
+            //adding the early leave of a student 
+            const data = await con.execute(`UPDATE attendance_users_lessons
+                                            SET exithour=?
+                                            WHERE id_user=? AND id_lesson=?;`, 
+                                        [rqbody.exithour,rqbody.iduser,rqbody.idlesson]);
+            res.json(data);
+        } catch (err) {
+            console.log("Deletelesson Error: " + err);
+            res.json({ error: true, errormessage: "GENERIC_ERROR" });
+        }
+    });
+
+
+    /* DEPRECATA */
     //DOVREBBE FUNZIONARE,DA CONTROLLARe
     //starting the lesson and connecting all the student
     app.get('/startlesson/:idcourse/:idlesson', jsonParser, authenticateToken, async (req, res) => {
@@ -354,71 +587,10 @@ function initLessonRoutes(app) {
     })
 
 
-    //DOVREBBE FUNZIONARE,DA CONTROLLARE
-    //register the presence of a student to the lesson,also create the presence
-    app.post('/createattendance', authenticateToken, async (req, res) => {
-        let rqbody = req.body;
-        try {
-            //looking if the student is enrollend in the course
-            const validation = await con.query(`select urc.id_user as iduser,l.begindate begindate  from lessons l 
-                                                inner join modules m on l.id_modules =m.id
-                                                inner join users_roles_courses urc on urc.id_course =m.id_course
-                                                where urc.id_user =? and urc.id_role =1 and l.id=?`, [rqbody.iduser,rqbody.idlesson]);
-            if (validation[0].length < 1) {
-                res.json({ error: true, errormessage: "THE USER CANNOT ATTEND THIS LESSON" });
-                return;
-            }
-            const date = new Date()
-            //if the lesson hasn't already started
-            if(date<validation[0]["begindate"]){
-                res.json({ error: true, errormessage: "THE LESSON HASN'T ALREADY STARTED" });
-                return;
-            }
-            //creating the attendance to the lesson
-            const data = await con.execute(`UPDATE attendance_users_lessons 
-                                          set entryhour=?
-                                          where id_user=? and  id_lesson=?;`, 
-                                          [rqbody.entryhour,rqbody.iduser,rqbody.idlesson]);
-            res.json(data);
-        } catch (err) {
-            console.log("Deletelesson Error: " + err);
-            res.json({ error: true, errormessage: "GENERIC_ERROR" });
-        }
-    });
 
-    //DOVREBBE ESSERE FINITA,DA PROVARE
-    //register the hourse of leaving the lesson early
-    app.patch('/leavinglesson/:idcourse', authenticateToken, async (req, res) => {
+  
 
-        let rqbody = req.body;
-        try {
-            //looking if the student is attending the lessong
-            const validation = await con.query(`select aul.entryhour as entryhour,l.enddate as enddate from attendance_users_lessons aul 
-                                                inner join lessons l on l.id=aul.id_lesson
-                                                where aul.id_user =? and aul.id_lesson =?`,
-                                                [rqbody.iduser,rqbody.idlesson]);
-            if (validation[0].length < 1) {
-                res.json({ error: true, errormessage: "THE USER HASN'ALREADY ATTEND THE LESSON" });
-                return;
-            }
-            const date = new Date()
-            //the lesson has already ended
-            if(date>validation[0]["enddate"]){
-                res.json({ error: true, errormessage: "THE LESSON HAS ALREADY ENDED " });
-                return;
-            }
-            //adding the early leave of a student 
-            const data = await con.execute(`UPDATE attendance_users_lessons
-                                            SET exithour=?
-                                            WHERE id_user=? AND id_lesson=?;`, 
-                                        [rqbody.exithour,rqbody.iduser,rqbody.idlesson]);
-            res.json(data);
-        } catch (err) {
-            console.log("Deletelesson Error: " + err);
-            res.json({ error: true, errormessage: "GENERIC_ERROR" });
-        }
-    });
-
+    //DEPRECATA
     //DOVREBBE ESSERE CORRETTO;DA CONTROLLARE
     //ending the lesson
     app.get('/endthelesson/:idcourse/:idlesson', jsonParser, authenticateToken, async (req, res) => {

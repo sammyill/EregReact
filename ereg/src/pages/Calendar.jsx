@@ -28,9 +28,8 @@ export default  function Calendar() {
   const {activeCourseId,activeCourseName,token}=useContext(EregContext);
    const [newLesson,setNewLesson]=useState(false);
    const [errorAddingLesson,setErrorAddingLesson]=useState(false);
-  const[isDetailsActive,setIsDetailsActive]=useState(false)
-  const todayMonth=todayDate.getMonth();
-  const todayYear=todayDate.getFullYear();
+  const[isDetailsActive,setIsDetailsActive]=useState({status:false})
+  let choosenlesson;
   // /getalllessons/:idcourse/:month/:year
   //da modificare prendendo la data di oggi in futuro
   //aggingere de la durata del modulo è 0 Non ci sono lezioni
@@ -58,7 +57,8 @@ export default  function Calendar() {
 
   function handleRequestDetails(lessonId){
      console.log("lessonID:",lessonId)
-     setIsDetailsActive(true)
+     choosenlesson=lessonId
+     setIsDetailsActive({status:true,choosenLesson:lessonId})
   }
 
   const handleSubmit =async (event) => {
@@ -90,6 +90,10 @@ export default  function Calendar() {
     setNewLesson(true)
   }
 
+  function handleGoBack(){
+    setIsDetailsActive({status:false})
+  }
+
   useEffect(() => {
     async function fetchData() {
       const data = await fetchHelper('GET',`/getalllessons/${activeCourseId}/${reqMonth}/${reqYear}`,token,"none");
@@ -106,7 +110,7 @@ export default  function Calendar() {
     }
     fetchData();
   }, [calendarReload,activeCourseId,reqMonth,reqYear]);
-  if(isDetailsActive) return(<p>prova</p>)
+  if(isDetailsActive.status) return(<LessonPage  courseID={activeCourseId} lessonId={isDetailsActive.choosenLesson} onGoBack={handleGoBack} />)
   //console.log(`La mia data è Mese ${monthName[reqMonth]} Anno: ${reqYear}`)
   if(lessonsData){
     return (

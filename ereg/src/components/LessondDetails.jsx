@@ -1,10 +1,14 @@
-import { useEffect,useState } from "react";
-import { fetchHelper } from "../utilities";
+import { useEffect,useState,useContext } from "react";
+import { fetchHelper,fullName,formatTimeFromDate,isFutureDate,formatFullDateTime } from "../utilities";
+import { EregContext } from "../contexts/EregContext";
+const todayDate=new Date();
 
 export default function LessonPage  ({ courseID,lessonId, onGoBack }) {
   const [lessonDetails,setlessonDetails]=useState(null);
   const [students,setStudents]=useState(null);
- 
+  const {token}=useContext(EregContext)
+
+  //console.log("props:", courseID,lessonId, onGoBack )
   useEffect(()=>{
   async function fetchData() {
       const data = await fetchHelper('GET',`/getalesson/${courseID}/${lessonId}`,token,"none");
@@ -19,9 +23,19 @@ export default function LessonPage  ({ courseID,lessonId, onGoBack }) {
     setlessonDetails((prev)=>{
       return{
         ...prev,
-
+      notes:e.target.value
       }
     })
+
+
+  }
+
+  function handleExit(){
+
+  }
+
+  function handleEnter(){
+    
   }
   if(!lessonDetails ) return(<p className="h-[500px]">Error,Contact your coordinator or an admin</p>)
   return (
@@ -30,13 +44,13 @@ export default function LessonPage  ({ courseID,lessonId, onGoBack }) {
       <div className="bg-white rounded-2xl shadow p-4 space-y-2 text-center">
         <h2 className=" md:text-2xl text-base font-semibold text-gray-800">{lessonDetails.modulename}</h2>
         <div className="text-gray-600 text-sm md:text-base">
-          <p>Begin: <span className="font-medium">{lessonDetails.begindate}</span></p>
-          <p>Eng: <span className="font-medium">{lessonDetails.enddate}</span></p>
+          <p>Begin: <span className="font-medium">{formatFullDateTime(lessonDetails.begindate)}</span></p>
+          <p>End: <span className="font-medium">{formatFullDateTime(lessonDetails.enddate)}</span></p>
         </div>
       </div>
 
       {/* Notes */}
-      <div>
+      <div className="flex flex-col justify-center items-center">
         <label className="block text-gray-700 font-medium mb-2" htmlFor="lesson-note">Notes</label>
         <textarea
           id="lesson-note"
@@ -46,7 +60,8 @@ export default function LessonPage  ({ courseID,lessonId, onGoBack }) {
           value={lessonDetails.notes || ""}
           onChange={(e)=>handleNotes(e)}
         ></textarea>
-      </div>
+        <button className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 mt-1">Update</button>
+      </div  >
 
       {/* Student List */}
       <div className="bg-white rounded-2xl shadow p-4">
@@ -54,10 +69,19 @@ export default function LessonPage  ({ courseID,lessonId, onGoBack }) {
         <ul className="space-y-3">
           {students.map((student, index) => (
             <li key={index} className="flex items-center justify-between p-3 border rounded-xl">
-              <span className="text-gray-800">{student.name}</span>
+              <span className="text-gray-800">{fullName(student.firstname,student.lastname)}</span>
               <div className="space-x-2">
-                <button className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600">Enter</button>
-                <button className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600">Exit</button>
+                {student.entry_hour?
+                `Entrance:${formatTimeFromDate(student.entry_hour)}  `:
+                isFutureDate(lessonDetails.enddate) ? 
+                  <button className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600">Enter</button>:"Assente  "
+                 }
+                {student.exit_hour?
+                `Leave:${formatTimeFromDate(student.exit_hour)}  `:
+                isFutureDate(lessonDetails.enddate) ? 
+                  <button className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600">Exit</button>:"Assente  "
+                 }
+                
               </div>
             </li>
           ))}
