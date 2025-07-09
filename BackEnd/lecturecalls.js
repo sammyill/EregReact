@@ -131,7 +131,7 @@ function initLessonRoutes(app) {
 
             }
             */
-            const [students]=await con.execute(`SELECT u.firstname,u.lastname,aul.entryhour AS entry_hour,aul.exithour AS exit_hour
+            const [students]=await con.execute(`SELECT u.firstname,u.lastname,u.id as iduser,aul.entryhour AS entry_hour,aul.exithour AS exit_hour
                                         FROM lessons l
                                         INNER JOIN modules m ON m.id = l.id_modules
                                         INNER JOIN courses c ON c.id = m.id_course
@@ -353,15 +353,17 @@ function initLessonRoutes(app) {
     app.post('/studentattend/:idcourse/:idlesson/:idstudent', jsonParser, authenticateToken, async (req, res) => {
         let idlesson=req.params.idlesson;
         let idstudent=req.params.idstudent
-        let iduser=req.user.iduser
+        let iduser=req.user.userid
         let rqbody = req.body;
+        console.log("IDLESSON,IDSTUDENT,IDUSERREQUIRING",idlesson,idstudent,iduser)
         try {
 
             //looking if the student is enrollend in the course
             const validation = await con.query(`select urc.id_user as iduser,l.begindate ,l.enddate  from lessons l 
                                                 inner join modules m on l.id_modules =m.id
                                                 inner join users_roles_courses urc on urc.id_course =m.id_course
-                                                where urc.id_user =? and urc.id_role =1 and l.id=?`, [rqbody.iduser,rqbody.idlesson]);
+                                                where urc.id_user =? and urc.id_role =1 and l.id=?`, [idstudent,idlesson]);
+            console.log("validation student presence",validation)
             if (validation[0].length < 1) {
                 res.json({ error: true, errormessage: "THE USER CANNOT ATTEND THIS LESSON" });
                 return;
@@ -380,11 +382,13 @@ function initLessonRoutes(app) {
             const validateowner = await con.query(`select um.id_user as idowner from lessons l
                                             inner  join users_modules um on um.id_module =l.id_modules
                                             inner join users u on um.id_user =u.id
-                                            where l.id ? and um.permit =2`,
+                                            where l.id=? and um.permit =2`,
                                                [idlesson]);
- 
+           console.log("validate owner",validateowner)
+           console.log("parsingiduser",parseInt(iduser))
+           console.log("parsint idowner",validateowner[0][0]["idowner"])
             //the user trying to end the lesson is not the owner of the lesson
-            if(parseInt(iduser)!==parseInt(validateowner[0]["idowner"])){
+            if(parseInt(iduser)!==parseInt(validateowner[0][0]["idowner"])){
                 res.json({ error: true, errormessage: "YOU ARE NOT THE OWNER,NOT ALLOWED" });
                 return;
             }
@@ -397,7 +401,7 @@ function initLessonRoutes(app) {
             
             res.json(data);
         } catch (err) {
-            console.log("Deletelesson Error: " + err);
+            console.log(" Error: " + err);
             res.json({ error: true, errormessage: "GENERIC_ERROR" });
         }
     })
@@ -447,7 +451,7 @@ function initLessonRoutes(app) {
             const validation = await con.query(`select urc.id_user as iduser,l.begindate ,l.enddate  from lessons l 
                                                 inner join modules m on l.id_modules =m.id
                                                 inner join users_roles_courses urc on urc.id_course =m.id_course
-                                                where urc.id_user =? and urc.id_role =1 and l.id=?`, [rqbody.iduser,rqbody.idlesson]);
+                                                where urc.id_user =? and urc.id_role =1 and l.id=?`, [idstudent,idlesson]);
             if (validation[0].length < 1) {
                 res.json({ error: true, errormessage: "THE USER CANNOT ATTEND THIS LESSON" });
                 return;
@@ -465,7 +469,7 @@ function initLessonRoutes(app) {
             const validatepresence = await con.query(`select aul.entryhour as entryhour,l.enddate as enddate from attendance_users_lessons aul 
                                                 inner join lessons l on l.id=aul.id_lesson
                                                 where aul.id_user =? and aul.id_lesson =?`,
-                                                [rqbody.iduser,rqbody.idlesson]);
+                                                [idstudent,idlesson]);
             if (validatepresence[0].length < 1 || validatepresence[0]["entryhour"]==null ) {
                 res.json({ error: true, errormessage: "THE USER HASN'ALREADY ATTEND THE LESSON" });
                 return;
