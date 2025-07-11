@@ -443,12 +443,12 @@ function initLessonRoutes(app) {
     app.patch('/studenleave/:idcourse/:idlesson/:idstudent', jsonParser, authenticateToken, async (req, res) => {
         let idlesson=req.params.idlesson;
         let idstudent=req.params.idstudent
-        let iduser=req.user.iduser
+        let iduser=req.user.userid
         let rqbody = req.body;
         try {
-
+            console.log("PROBLEM AT THE START")
             //looking if the student is enrollend in the course
-            const validation = await con.query(`select urc.id_user as iduser,l.begindate ,l.enddate  from lessons l 
+            const [validation] = await con.query(`select urc.id_user as iduser,l.begindate ,l.enddate  from lessons l 
                                                 inner join modules m on l.id_modules =m.id
                                                 inner join users_roles_courses urc on urc.id_course =m.id_course
                                                 where urc.id_user =? and urc.id_role =1 and l.id=?`, [idstudent,idlesson]);
@@ -457,6 +457,7 @@ function initLessonRoutes(app) {
                 return;
             }
             const date = new Date()
+    
             //if the lesson hasn't already started
             if(date<validation[0]["begindate"]){
                 res.json({ error: true, errormessage: "THE LESSON HASN'T ALREADY STARTED" });
@@ -466,10 +467,11 @@ function initLessonRoutes(app) {
                 res.json({ error: true, errormessage: "THE LESSON HAR ALREADY ENDED" });
                 return;
             }
-            const validatepresence = await con.query(`select aul.entryhour as entryhour,l.enddate as enddate from attendance_users_lessons aul 
+            const [validatepresence] = await con.query(`select aul.entryhour as entryhour,l.enddate as enddate from attendance_users_lessons aul 
                                                 inner join lessons l on l.id=aul.id_lesson
                                                 where aul.id_user =? and aul.id_lesson =?`,
                                                 [idstudent,idlesson]);
+            console.log("validatePresence",validatepresence)
             if (validatepresence[0].length < 1 || validatepresence[0]["entryhour"]==null ) {
                 res.json({ error: true, errormessage: "THE USER HASN'ALREADY ATTEND THE LESSON" });
                 return;
@@ -478,16 +480,16 @@ function initLessonRoutes(app) {
                  res.json({ error: true, errormessage: "ERROR ENTRI DATE IS BIGGER THAN LEAVING DATE,THE STUDENT CANNO LEAVE BEFORE ATTENDING A LESSON " });
                 return; 
             }
-
+            console.log("PROBLEM AR THE END")
             //looking for the enddate and the id of the propietary of the course
             const validateowner = await con.query(`select um.id_user as idowner from lessons l
                                             inner  join users_modules um on um.id_module =l.id_modules
                                             inner join users u on um.id_user =u.id
-                                            where l.id ? and um.permit =2`,
+                                            where l.id=? and um.permit =2`,
                                                [idlesson]);
- 
+            console.log("iduser,owner",iduser,validateowner[0][0]["idowner"])
             //the user trying to end the lesson is not the owner of the lesson
-            if(parseInt(iduser)!==parseInt(validateowner[0]["idowner"])){
+            if(parseInt(iduser)!==parseInt(validateowner[0][0]["idowner"])){
                 res.json({ error: true, errormessage: "YOU ARE NOT THE OWNER,NOT ALLOWED" });
                 return;
             }
@@ -504,6 +506,8 @@ function initLessonRoutes(app) {
             res.json({ error: true, errormessage: "GENERIC_ERROR" });
         }
     })
+    
+ 
     
 
 

@@ -103,7 +103,7 @@ export default function LessonPage  ({ courseID,lessonId, onGoBack }) {
                 `Leave:${formatTimeFromDate(student.exit_hour)}  `:
                 isFutureDate(lessonDetails.enddate) ? 
                   <button className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 disabled:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed" 
-                  onClick={()=>handleEnter(student.iduser)} 
+                  onClick={()=>handleExit(student.iduser)} 
                   disabled={!isOwner ||isFutureDate(lessonDetails.begindate) }>Exit</button>:"Assente  "
                  }           
               </div>
