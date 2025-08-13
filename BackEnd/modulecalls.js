@@ -38,7 +38,6 @@ function autCheck(req,res,next,permits){
 
 function initModuleRoutes(app) {
 
-    //COMPLETA
     //add a module to te course
     app.post('/addmodule', jsonParser, authenticateToken, async (req, res) => {
         let rqbody = req.body;
@@ -118,7 +117,7 @@ function initModuleRoutes(app) {
 
     })
  
-    //COMPLETA
+
     //delete a module of the course
     app.delete('/deletemodule/:idcourse/:idmodule', authenticateToken, async (req, res) => {
         let deleteid = req.params.idmodule;

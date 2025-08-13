@@ -45,7 +45,7 @@ function autCheck(req,res,next,permits){
 
 
 function initUserRoutes(app) {
-    //COMPLETA
+
     //logging into the server
     //sending toke,user general information,course of the user
     app.post('/login', jsonParser, async (req, res) => {
@@ -102,33 +102,6 @@ function initUserRoutes(app) {
       }
     })
 
-    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    //                  DEPRECATA
-    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    //get all the users of a course
-    app.get('/getallusers/:idcourse', authenticateToken, async (req, res) => {
-        let idcourse = req.params.idcourse;
-        let data
-        let role=req.user.roles.find(rlc=>rlc.idcourse=idcourse).idrole;
-        try {
-            if(req.user.isAdmin===true || role===3)[data] = await con.execute(`select u.id as iduser,u.firstname,u.lastname,u.imgurl,u.status,r.id as idrole,r.name as rolename from users u
-                                                            inner join users_roles_courses urc on urc.id_user =u.id
-                                                            inner join roles r on urc.id_role =r.id
-                                                            where urc.id_course =?
-                                                            order by idrole desc`,
-                                                            [idcourse]);
-            if(req.userrole===2 || role===1)[data] = await con.execute(`select u.id as iduser,u.firstname,u.lastname,u.imgurl,u.status,r.id as idrole,r.name as rolename from users u
-                                                            inner join users_roles_courses urc on urc.id_user =u.id
-                                                            inner join roles r on urc.id_role =r.id
-                                                            where urc.id_course =? and u.status =1
-                                                            order by idrole desc`,
-                                                            [idcourse]);
-            res.json(data);
-        } catch (err) {
-            console.log("Getallusers Error:" + err);
-            res.json({ error: true, errormessage: "GENERIC_ERROR" });
-        }
-    })
 
 
     /**
@@ -215,7 +188,7 @@ function initUserRoutes(app) {
         }
     }) 
  
-    //DOVREBBE ESSERE GIUSTA,DA PROVARE 
+  
     //get self and only self
        app.get('/getself/:idcourse', authenticateToken, async (req, res) => {
         let iduser=req.user.userid;
@@ -250,141 +223,7 @@ function initUserRoutes(app) {
         }
         })
 
-
-   
-    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    //                  DEPRECATA
-    //    E AGGIUNT AD AMMINUSTRATORE
-    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-   //create a new user inside a course
-   app.post('/addnewuser/:idcourse',authenticateToken ,jsonParser, async (req, res) => {
-   let idcourse = req.params.idcourse;
-   let rqbody = req.body;
-   try{
  
-     //user validation
-     const validation = await con.query(`select id from users where fiscalcode = ?`, [rqbody.fiscalcode]);
-     if(validation[0].length < 1)
-     {
-       var hash = crypto.createHash('sha256').update(rqbody.password).digest('hex');
-       //user creation
-       const [data] = await con.execute(`insert into users (password,lastname,firstname,phone,email,status,fiscalcode,age) values (?,?,?,?,?,?,?,?)`, 
-                                       [hash, rqbody.lastname, rqbody.firstname, rqbody.phone, rqbody.email, rqbody.status, rqbody.fiscalcode,rqbody.age]);
-       const inserteduser=await con.query(`select id from users where fiscalcode = "${rqbody.fiscalcode}"`);
-       const iduser=inserteduser[0]["id"];
-       //connecting the user to the course
-       const [datarolcor]=await con.execute(`INSERT INTO users_roles_courses (id_user, id_role, id_course) VALUES(?,?,?);`,
-                                                                                            [iduser,rqbody.role,idcourse])
-       //connecting the user to the modules, permit 1 for the students,permit 0 for the professors and coordinator
-       const [datamod]=await con.query(` insert into users_modules (id_user,id_module,permit)
-                                         select ? as id_user,m.id as id_module,${(rqbody.role===1)? 1:0} as permit from  modules m 
-                                         left join users_modules um on um.id_user =?
-                                         where m.id_course =?`
-                                        ,[iduser,iduser,idcourse])
-       
-       res.json(`${data} ${datarolcor}${datamod}`);
-     }else{
-       res.json({ error: true, errormessage: "FISCALCODE_EXISTS"});
-     }
-     
-   } catch(err) {
-     console.log("Createuser Error: " + err);
-     res.json({ error: true, errormessage: "GENERIC_ERROR"});
-   }
- 
- })
-    
-
-    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    //                  DEPRECATA
-    //    E AGGIUNT AD AMMINUSTRATORE
-    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    //DOBREBBE FUNZIONARE,VA TESTATA
-    //update a the user of a course
-    app.patch('/updateuserofacourse/:idcourse/:iduser', jsonParser, authenticateToken, async (req, res) => {
-        let patchid = req.params.iduser;
-        let rqbody = req.body;
-        try {
-
-            //data validation
-            const validation = await con.query(`select id from users where id = ?`,[patchid]);
-            if (validation[0].length < 1) {
-                res.json({ error: true, errormessage: "INVALID_USER_ID" });
-                return;
-            }
-
-            //update user
-            var hash = crypto.createHash('sha256').update(rqbody.password).digest('hex');
-            //update the user
-            const data = await con.execute(`update users set lastname =? ,firstname =?, phone =?, age=?,email=? ,password=? , status =?, fiscalcode =? where id =?`,
-                                                [rqbody.lastname,rqbody.firstname,rqbody.phone,rqbody.age,rqbody.email,hash,rqbody.status,rqbody.fiscalcode,patchid]);
-            res.json(data,datarole);
-
-        } catch (err) {
-            console.log("Updateuser Error: " + err);
-            res.json({ error: true, errormessage: "GENERIC_ERROR" });
-        }
-
-    })
-   
-
-    //--------------------------------------------
-    //DEPRECATA
-    //----------------------------------------------
-    //DOVREBBE FUNZIONARE MA NON DOVREBBE SERVIRE
-    //update your own password
-    app.patch('/updateownpwd/:idcourse/:iduser', jsonParser, authenticateToken, async (req, res) => {
-        let rqbody = req.body;
-        try {
-
-            //data validation
-            const validation = await con.query(`select id from users where id =?`,[rqbody.iduser]);
-            if (validation[0].length < 1) {
-                res.json({ error: true, errormessage: "INVALID_USER" });
-                return;
-            }
-
-            //update user password
-            var hash = crypto.createHash('sha256').update(rqbody.password).digest('hex');
-            const data = await con.execute(`update users set password =? where id =?`,[hash,rqbody.iduser]);
-            res.json(data);
-
-        } catch (err) {
-            console.log("Updatepwd Error: " + err);
-            res.json({ error: true, errormessage: "GENERIC_ERROR" });
-        }
-
-    })
-
-    //--------------------------------------------
-    //DEPRECATA
-    //----------------------------------------------
-    //DOVREBBE FUNZIONARE ,DA PROVARE
-    //update your own password
-    app.patch('/updatepwd/:idcourse', jsonParser, authenticateToken, async (req, res) => {
-        let rqbody = req.body;
-        try {
-
-            //data validation
-            const validation = await con.query(`select id from users where id = ?`,[req.user.userid]);
-            if (validation[0].length < 1) {
-                res.json({ error: true, errormessage: "INVALID_USER" });
-                return;
-            }
-
-            //update user password
-            var hash = crypto.createHash('sha256').update(rqbody.password).digest('hex');
-            const data = await con.execute(`update users set password =? , email=? where id =?`,[hash,rqbody.email,req.user.userid]);
-            res.json(data);
-
-        } catch (err) {
-            console.log("Updatepwd Error: " + err);
-            res.json({ error: true, errormessage: "GENERIC_ERROR" });
-        }
-
-    })
-
-    //DOVREBBE FUNZIONARE ,DA PROVARE
     //update your own password
     app.patch('/changepw', jsonParser, authenticateToken, async (req, res) => {
         let rqbody = req.body;
@@ -404,65 +243,8 @@ function initUserRoutes(app) {
 
     })
 
-    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    //                  DEPRECATA
-    //    E AGGIUNT AD AMMINUSTRATORE
-    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    //resetting the password with a random one
-    app.get('/resetmypassword', jsonParser, authenticateToken, async (req, res) => {
-        //cheating a new random password for the user
-        const lwcLetters=["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
-        const upcLetters=["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
-        let newpassword="";
-        for(let i=0;i<10;i++){
-        let randomChoice=Math.floor(Math.random() * 3);
-        if (randomChoice===0) newpassword+=Math.floor(Math.random() * 9);
-        if (randomChoice===1) newpassword+=lwcLetters[Math.floor(Math.random() * 24)];
-        if (randomChoice===2) newpassword+=upcLetters[Math.floor(Math.random() * 24)];
-        }
-        console.log(newpassword);
 
-        try {
-            const validation = await con.query(`select id from users where id = ?`,[req.user.userid]);
-            if (validation[0].length < 1) {
-                res.json({ error: true, errormessage: "INVALID_USER" });
-                return;
-            }
-            var hash = crypto.createHash('sha256').update(newpassword).digest('hex');
-            const data = await con.execute(`update users set password =? where id =?`,[hash,req.user.userid]);
-            res.json(data);
-        } catch (err) {
-            console.log("Updatepwd Error: " + err);
-            res.json({ error: true, errormessage: "GENERIC_ERROR" });
-        }
 
-    })
-
-    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    //                  DEPRECATA
-    //    E AGGIUNT AD AMMINUSTRATORE
-    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    //DOVREBBE ESSERE COMPLETA,DA PROVARE
-    //delete a user
-    app.delete('/deleteuser/:idcourse/:iduser', authenticateToken, async (req, res) => {
-        let deleteid = req.params.id;
-        try {
-            //data validation
-            const validation = await con.query(`select id from users where id =?`,[deleteid]);
-            if (validation[0].length < 1) {
-                res.json({ error: true, errormessage: "INVALID_USER_ID" });
-                return;
-            }
-
-            //delete user
-            const data = await con.execute(`delete from users where id =?`,[deleteid]);
-            res.json({error:false,message:`user deleted`});
-        } catch (err) {
-            console.log("Deleteuser Error: " + err);
-            res.json({ error: true, errormessage: "GENERIC_ERROR" });
-        }
-
-    })
 }
 
 module.exports = initUserRoutes;
