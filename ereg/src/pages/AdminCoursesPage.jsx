@@ -29,7 +29,8 @@ export default function AdmincoursesPage() {
     <>
     <div className="m-auto w-[60vw]   pt-7 flex flex-col  justify-center align-middle   ">
       {courses.map((course)=>
-      <SimpleCard  
+      <SimpleCard 
+      key={course.id} 
       cardLabel={`${course.name} ${course.startyear}-${course.endyear}`}   
       elementID={course.id}  
       elementStatus={course.status===1 ? "active":"inactve"}
