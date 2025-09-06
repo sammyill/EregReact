@@ -2,6 +2,7 @@
 //aggiungere pulsanti che permettono di scorrere la lista 
 import { useState,useEffect,useContext } from "react"
 import SimpleCard from "../components/SimpleCard"
+import Button from "../components/Button";
 import { useNavigate } from 'react-router-dom';
 import { fetchHelper } from "../utilities";
 import { EregContext } from "../contexts/EregContext";
@@ -28,6 +29,7 @@ export default function AdmincoursesPage() {
   return (
     <>
     <div className="m-auto w-[60vw]   pt-7 flex flex-col  justify-center align-middle   ">
+      <Button styleType={"standard"} onClick={()=>navigate(`/addEditCourse`)}>Aggingi Corso</Button>
       {courses.map((course)=>
       <SimpleCard 
       key={course.id} 
@@ -36,8 +38,6 @@ export default function AdmincoursesPage() {
       elementStatus={course.status===1 ? "active":"inactve"}
       navigateToPage="/admincoursedetail"/>
       )}
-      <SimpleCard   cardLabel="Industrial Software  Developer 2029-2032"   elementID="2"  elementStatus="active"/>
-      <SimpleCard  cardLabel="Mario Sgravola Mario.Scravola@gmail.com" elementID="2" elementStatus="inactve" />
       </div>
     </>
   );

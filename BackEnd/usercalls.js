@@ -9,7 +9,7 @@ const { path } = require('express/lib/application');
 var jsonParser = bodyParser.json();
 
 function generateAccessToken(payload) {
-    return jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: '86400s' });
+    return jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: '2629800s' });
 }
 
 function authenticateToken(req, res, next) {
