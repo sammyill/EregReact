@@ -78,11 +78,19 @@ export default function ModuleCard({title,modulePFN="sconosciuto",
       <>
     <div className="w-full basis-full  flex-shrink-0">
     {elHasHerror &&<div className="text-center text-red-600">Cannot update the module</div>}
-    <FormWrapper confirmButton="Update" regetButton="Don't update" handleSubmit={handleSubmit} handleReget={handleReget} moduleName="moduleName" moduleLenght="moduleLenght" moduleDescription="moduleDescription">
+    <FormWrapper 
+      confirmButton="Update" 
+      regetButton="Don't update" 
+      handleSubmit={handleSubmit} 
+      handleReget={handleReget} 
+      moduleName="moduleName" 
+      moduleLenght="moduleLenght"
+      moduleDescription="moduleDescription"
+     >
       <InputField {...{...moduleName,startingvalue:title}} />
       <InputField {...{...moduleLenght,startingvalue:length}} />
       <TextArea  {...{...moduleDescription,startingvalue:description}} />
-      <InputSelect label="Prfessori" id="newprofessor" name="newprofessor" values={availableProfessors} selectedvalue={professorID}/> 
+      <InputSelect label="Professori" id="newprofessor" name="newprofessor" values={availableProfessors} selectedvalue={professorID}/> 
     </FormWrapper>
     </div>
       </>

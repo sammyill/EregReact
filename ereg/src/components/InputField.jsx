@@ -6,7 +6,7 @@ export default function InputField({type,setFormIsValid,label,id,name,whatIsRigh
     const [error,setError]=useState(false);
  
     useEffect(()=>{
-         if(constrolExpression.test(startingvalue)){
+     if(constrolExpression.test(startingvalue)){
            setFormIsValid((prev)=>{
       return{
         ...prev,
@@ -14,6 +14,10 @@ export default function InputField({type,setFormIsValid,label,id,name,whatIsRigh
       } })
     }
     },[])
+
+    useEffect(()=>{
+      setValue(startingvalue);
+    },[startingvalue])
  
 
     function handleChage(e){

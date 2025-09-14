@@ -22,6 +22,7 @@ import Calendar from './pages/Calendar';
 import UserAccount from './pages/UserAccount';
 import AdmincoursesPage from './pages/AdminCoursesPage';
 import AdminCourseDetails from './pages/AdminCourseDetails';
+import AdminAddEditCourse from './pages/AdminAddEditCourse';
 
 import './App.css'
 
@@ -38,8 +39,10 @@ function AppRoutes() {
       </Routes>):
       (<>
       <Header/>
+      <div className='min-h-[80vh]'>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/addEditCourse/:id?" element={<AdminAddEditCourse />}/>
         <Route path="/admincoursedetail" element={<AdminCourseDetails />} />
          <Route path="/admincoursespage" element={<AdmincoursesPage />} />
         <Route path="/devpage" element={<DevPage />} />
@@ -55,6 +58,7 @@ function AppRoutes() {
         <Route path="/errorpage" element={<ErrorPage />} />
         <Route path="*" element={<ErrorPage />} />
       </Routes>
+      </div>
       <Footer/>
       </>)
       }

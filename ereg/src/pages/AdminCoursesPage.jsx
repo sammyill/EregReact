@@ -29,7 +29,7 @@ export default function AdmincoursesPage() {
   return (
     <>
     <div className="m-auto w-[60vw]   pt-7 flex flex-col  justify-center align-middle   ">
-      <Button styleType={"standard"} onClick={()=>navigate(`/addEditCourse`)}>Aggingi Corso</Button>
+      <Button styleType={"standard"} onClick={()=>navigate(`/addEditCourse`)}>Aggiungi Corso</Button>
       {courses.map((course)=>
       <SimpleCard 
       key={course.id} 

@@ -20,14 +20,18 @@ export default function AdminCourseDetails(){
   useEffect(() => {
     async function fetchData() {
       const data = await fetchHelper('GET',`/getcourse/${id}`,token,"none");
-      console.log(data)
        if(data.error) setIsError({error:true,message:"unexpected load error"})
       setCourseData(data);
     }
     if(id) fetchData();
   }, [id]);
-  const handleDelete=()=>{
 
+  const handleDelete=async ()=>{
+    const data = await fetchHelper('DELETE',`/deletecourse/${id}`,token,"none");
+    if(data.error) setIsError({error:true,message:"Errore cancellazione"})
+    else {
+      navigate("/admincoursespage")
+    }
   }
 
   if(isError?.error)navigate("/errorpage")
@@ -37,6 +41,7 @@ export default function AdminCourseDetails(){
   const users = courseData?.courseUsers || [];
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
+    
       {/* Course details */}
       <div className="bg-white rounded-2xl shadow p-6 border border-gray-200">
         <h1 className="text-2xl font-semibold text-gray-900 mb-2">
@@ -80,17 +85,19 @@ export default function AdminCourseDetails(){
         </tbody>
         </table>
       </div>
-      <div>
+      <div className=' flex flex-row align-middle justify-center space-x-30 '>
         {deleteOn ? 
         <>
-        <Button styleType={danger} onClick={()=>handleDelete()}>Conferma</Button>
-        <Button styleType={standard} onClick={()=>setDeleteOn((prev)=>!prev)}>Annulla</Button>
+        <Button  styleType={"danger"} onClick={handleDelete}>Conferma</Button>
+        <Button styleType={"standard"} onClick={()=>setDeleteOn((prev)=>!prev)}>Annulla</Button>
         </>
-        :
-        <Button styleType={danger} onClick={()=>setDeleteOn((prev)=>!prev)}>Elimina</Button>
+        :<>
+        <Button styleType={"danger"} onClick={()=>setDeleteOn((prev)=>!prev)}>Elimina</Button>
+         <Button styleType={"standard"} onClick={()=>navigate(`/addEditCourse/${id}`)}>Modifica</Button>
+        </>
         }
-        
-        <Button styleType={standard} onClick={()=>navigate(`/addEditCourse/${id}`)}>Modifica</Button>
+        {isError?.error&& <p>{isError.message}</p>}
+       
       </div>
     </div>
   );

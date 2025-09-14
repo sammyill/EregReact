@@ -7,7 +7,7 @@ export default function ModuleCard({moduleTitle,moduleProfessor,moduleDescriptio
 
 
     return (
- <footer className="bg-gray-800 text-gray-200 px-4 py-10">
+ <footer className="bg-gray-800 text-gray-200 px-4 py-10 ">
   <div className="max-w-6xl mx-auto grid gap-8 text-sm text-center md:text-left md:grid-cols-3">
     
     <div className="flex flex-col items-center md:items-start">
