@@ -20,8 +20,8 @@ const courseName = {
   type: "text",
   id: "courseName",
   name: "courseName",
-  whatIsRight: "Between 5 and 50 characters",
-  constrolExpression: /^.{5,50}$/,
+  whatIsRight: "Between 5 and 100 characters",
+  constrolExpression: /^.{5,100}$/,
 };
 
 // Using InputField (number) like your moduleLenght; allowed values 2 or 3
@@ -104,7 +104,7 @@ export default function AdminAddEditCourse({}) {
       setelHasHerror({error:true,message:"unexpected load error"});
       return;
     }
-
+    navigate("/admincoursespage")
     setSuccessMsg("Course created successfully.")
   }
 
@@ -117,6 +117,7 @@ export default function AdminAddEditCourse({}) {
       {successMsg && (
         <div className="text-center text-green-600">{successMsg}</div>
       )}
+      {(courseData &&isEdit) &&
      
       <FormWrapper
         confirmButton="Create"
@@ -127,14 +128,11 @@ export default function AdminAddEditCourse({}) {
         courseLenght="courseLenght"
         courseStartYear="courseStartYear"
         courseEndYear="courseEndYear"
-        courseStatus="courseStatus"
       >
         <InputField {...{...courseName,startingvalue:courseData?.name ||""}} />
         <InputField {...{...courseLenght,startingvalue:courseData?.lenght||""}} />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <InputField {...{...courseStartYear,startingvalue:courseData?.startyear||""}} />
-          <InputField {...{...courseEndYear,startingvalue:courseData?.endyear||""}} />
-        </div>
+        <InputField {...{...courseStartYear,startingvalue:courseData?.startyear||""}} />
+        <InputField {...{...courseEndYear,startingvalue:courseData?.endyear||""}} />
         <InputSelect
           label="Status"
           id="courseStatus"
@@ -143,7 +141,29 @@ export default function AdminAddEditCourse({}) {
           selectedvalue={1}
         />
       </FormWrapper>
-      
+      }
+      {!isEdit &&      <FormWrapper
+        confirmButton="Create"
+        regetButton="Annulla"
+        handleSubmit={handleSubmit}
+        handleReget={handleReget}
+        courseName="courseName"
+        courseLenght="courseLenght"
+        courseStartYear="courseStartYear"
+        courseEndYear="courseEndYear"
+      >
+        <InputField {...courseName} />
+        <InputField {...courseLenght} />
+        <InputField {...courseStartYear} />
+        <InputField {...courseEndYear} />
+        <InputSelect
+          label="Status"
+          id="courseStatus"
+          name="courseStatus"
+          values={statusOptions}
+          selectedvalue={1}
+        />
+      </FormWrapper>}
     </div>
   );
 }
