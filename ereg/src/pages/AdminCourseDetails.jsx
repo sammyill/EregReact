@@ -8,12 +8,21 @@ import { useState,useEffect,useContext } from "react"
 import { useNavigate } from 'react-router-dom';
 import { EregContext } from "../contexts/EregContext";
 import Button from '../components/Button';
-
+const roleValues = [
+  { idvalue: 1, labelvalue: "Studente" },
+  { idvalue: 2, labelvalue: "Professore" },
+  { idvalue: 3, labelvalue: "Coordinatore" },
+  { idvalue: 4, labelvalue: "Super Admin" },
+];
 export default function AdminCourseDetails(){
   const [courseData,setCourseData]=useState(null);
   const [isError,setIsError]=useState({});
   const [deleteOn,setDeleteOn]=useState(false)
   const location = useLocation();
+  const [editRole,setEditRole]=useState(false);
+  const [choosenNewRole,setChoosenNewRole]=useState(null);
+  const [reload,setReload]=useState(0);
+ // const [userRole,setUserRole]=useState({id:false,us})
   const {token}=useContext(EregContext)
   const navigate = useNavigate();
   const { id } = location.state || {};
@@ -24,7 +33,7 @@ export default function AdminCourseDetails(){
       setCourseData(data);
     }
     if(id) fetchData();
-  }, [id]);
+  }, [id,reload]);
 
   const handleDelete=async ()=>{
     const data = await fetchHelper('DELETE',`/deletecourse/${id}`,token,"none");
@@ -34,11 +43,23 @@ export default function AdminCourseDetails(){
     }
   }
 
+  const handleChangeRole=async()=>{
+
+    console.log("userid",choosenNewRole.userId);
+    console.log("roleId",choosenNewRole.roleId);
+    console.log("courseId",id);
+    const data = await fetchHelper('PATCH',`/changeuserrole/${choosenNewRole.userId}/${choosenNewRole.roleId}/${id}`,token,"none");
+    console.log("Data",data)
+    setEditRole(false);
+    setReload((prev)=>prev+1)
+  }
   if(isError?.error)navigate("/errorpage")
   if(!courseData)return(<p>No data found</p>)
   
   const course = courseData?.courseData?.[0] || null;
   const users = courseData?.courseUsers || [];
+
+  console.log("users",users)
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
     
@@ -78,7 +99,42 @@ export default function AdminCourseDetails(){
         <Td>{u.firstname}</Td>
         <Td>{u.lastname}</Td>
         <Td>{u.email}</Td>
-        <Td>{u.rolename}</Td>
+        <Td>
+        {editRole ?  
+        <>
+        <div className='flex flex-row align-middle justify-center gap-1'>
+          <select 
+            className="w-full px-4 py-2 border  border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            name={"userrole"}
+            id={"userrole"} 
+            defaultValue={u.roleid} 
+            onChange={(e)=>setChoosenNewRole({userId:u.id,roleId:e.target.value})}
+            required
+          >          
+          {roleValues.map((role)=>{
+            return <option className='text-black' key={role.idvalue} value={role.idvalue} >{role.labelvalue}</option>
+          })}
+          </select>
+          <span  
+            onClick={()=>{
+              setEditRole(false);
+              setChoosenNewRole(null)
+            }}
+            className="inline-flex h-10 w-10 items-center justify-center text-2xl font-bold text-red-600 border border-red-300 rounded-md hover:bg-red-50 cursor-default select-none leading-none"
+          >{"\u2718"}</span>
+          <span 
+            onClick={handleChangeRole}
+            className="inline-flex h-10 w-10 items-center justify-center text-2xl font-bold text-green-600 border border-green-300 rounded-md hover:bg-green-50 cursor-default select-none leading-none"
+          >{"\u2713"}</span>  
+          </div>
+        </>:
+        <>
+          {u.rolename} <span style={{cursor:"pointer"}} onClick={()=>{
+            setEditRole(true)
+            setChoosenNewRole({userId:u.id,roleId:u.roleid})
+            }}>&#9999;</span>
+        </>}
+      </Td>
         </tr>
         ))
         )}

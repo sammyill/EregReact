@@ -61,7 +61,7 @@ function initCourseRoutes(app) {
                 return;
             }
             const [courseData]=await con.execute(`select * from courses where id=?`,[courseid])    
-            const [courseUsers]=await con.execute(`select u.firstname,u.lastname ,u.email,r.name as rolename,r.id as roleid 
+            const [courseUsers]=await con.execute(`select u.id,u.firstname,u.lastname ,u.email,r.name as rolename,r.id as roleid 
                                                 from users u 
                                                 inner join users_roles_courses urc on urc.id_user =u.id
                                                 inner join courses c on urc.id_course =c.id
@@ -205,7 +205,7 @@ function initCourseRoutes(app) {
      * change the role of a user in the course
      */
     app.patch('/changeuserrole/:iduser/:idrole/:idcourse', authenticateToken, async (req, res) => {
-        let idcourse = req.body.idcourse;
+        let idcourse = req.params.idcourse;
         let iduser = req.params.iduser;
         let idrole=req.params.idrole
         try {
