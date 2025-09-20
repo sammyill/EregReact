@@ -43,6 +43,12 @@ export default function AdminCourseDetails(){
     }
   }
 
+  const handleUnlink=async (idUser)=>{
+    const response=await  fetchHelper('DELETE',`/unlinkuser/${idUser}/${id}`,token,"none")
+    console.log("response of unlink",response)
+    setReload((prev)=>prev+1)
+  }
+
   const handleChangeRole=async()=>{
 
     console.log("userid",choosenNewRole.userId);
@@ -133,6 +139,9 @@ export default function AdminCourseDetails(){
             setEditRole(true)
             setChoosenNewRole({userId:u.id,roleId:u.roleid})
             }}>&#9999;</span>
+            <span style={{cursor:"pointer",marginLeft:"5px"}} onClick={()=>{
+            handleUnlink(u.id)
+            }}>&#x1F517;</span>
         </>}
       </Td>
         </tr>

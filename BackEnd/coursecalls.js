@@ -239,7 +239,7 @@ function initCourseRoutes(app) {
      * Remove(unlink) the association between a user and a course
      */
     app.delete('/unlinkuser/:iduser/:idcourse', authenticateToken, async (req, res) => {
-        let idcourse = req.body.idcourse;
+        let idcourse = req.params.idcourse;
         let iduser = req.params.iduser;
         try {
             let validation = await con.query(`select id from courses where id = ?`, [idcourse]);
