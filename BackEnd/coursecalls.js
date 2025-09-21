@@ -165,15 +165,15 @@ function initCourseRoutes(app) {
         }
     })
 
-    //ADMIN ROUTES
         /**
          * Connect a new user to the course
          * courseid,userid and roleid are required
          */
-    app.post('/connectuser', authenticateToken, async (req, res) => {
-        let idcourse = req.body.idcourse;
-        let iduser = req.body.iduser;
-        let idrole=req.body.idrole
+    app.post('/connectuser', jsonParser, authenticateToken, async (req, res) => {
+        let rqbody= req.body
+        console.log("REQBODY",rqbody)
+        const {idcourse,iduser,idrole}=rqbody
+
         try {
             let validation = await con.query(`select id from courses where id = ?`, [idcourse]);
             if (validation[0].length < 1) {

@@ -12,6 +12,7 @@ the last field is the jsonbody
 */
 
 export async function fetchHelper(method,apiurl,token,userrequest){
+    console.log("USERREQUESTPAYLOAd",fetchHelper)
     let fetchurl=`${baseurl}${apiurl}`
     let fetchoption;
     if (method==="POST"||method==="PATCH") fetchoption={

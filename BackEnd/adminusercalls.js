@@ -66,6 +66,19 @@ function initAdminUserRoutes(app) {
         }
     })
 
+    /* GET ALL USERS NO OFFSET*/
+    app.get('/getallusers/', authenticateToken, async (req, res) => {
+        try {
+            const [users] = await con.execute(`select * from users u`);
+            if(users.length<=0) areUsersFinished=true;
+            res.json({error: false,users: users});
+            console.log(users.length)
+        } catch (err) {
+            console.log("Getallusers Error:" + err);
+            res.json({ error: true, errormessage: "GENERIC_ERROR" });
+        }
+    })
+
      /**
      * Return
      *The Bio informations of the user as and obj
