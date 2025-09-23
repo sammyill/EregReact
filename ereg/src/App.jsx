@@ -23,6 +23,9 @@ import UserAccount from './pages/UserAccount';
 import AdmincoursesPage from './pages/AdminCoursesPage';
 import AdminCourseDetails from './pages/AdminCourseDetails';
 import AdminAddEditCourse from './pages/AdminAddEditCourse';
+import AdminUsersPage from './pages/AmdinUsersPage';
+import AmdinUserDetails from './pages/AmdinUserDatails';
+import AdminAddEditUser from './pages/AdminAddEditUser';
 
 import './App.css'
 
@@ -44,7 +47,10 @@ function AppRoutes() {
         <Route path="/" element={<Home />} />
         <Route path="/addEditCourse/:id?" element={<AdminAddEditCourse />}/>
         <Route path="/admincoursedetail" element={<AdminCourseDetails />} />
-         <Route path="/admincoursespage" element={<AdmincoursesPage />} />
+        <Route path="/admincoursespage" element={<AdmincoursesPage />} />
+        <Route path="/adminuserspage" element={<AdminUsersPage />} />
+        <Route path="/adminuserdetail" element={<AmdinUserDetails />} />
+        <Route path="/addedituser/:id?" element={<AdminAddEditUser />}/>
         <Route path="/devpage" element={<DevPage />} />
         <Route path="/account" element={<UserAccount />} />
         <Route path="courses" element={<Courses />} />

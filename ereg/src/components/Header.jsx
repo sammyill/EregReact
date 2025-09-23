@@ -41,7 +41,8 @@ export default function Header(){
       <NavLink to="/courses" className="hover:text-blue-400">Courses</NavLink>
       <NavLink to="/devpage" className="hover:text-blue-400">Devpage</NavLink>
       {/* only for dev,remove and move to admin header after */}
-       <NavLink to="/admincoursespage" className="hover:text-blue-400">admincoursespage</NavLink>
+      <NavLink to="/admincoursespage" className="hover:text-blue-400">admincoursespage</NavLink>
+      <NavLink to="/adminuserspage" className="hover:text-blue-400">adminuserspage</NavLink>
     </nav>
 
  <div className="flex items-center gap-4 text-2xl">
