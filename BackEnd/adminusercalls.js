@@ -92,7 +92,7 @@ function initAdminUserRoutes(app) {
             const [user] = await con.execute(`select *  from users u 
                                             where u.id=? `,
                                             [iduser]); 
-            const [associatedcourses]=await con.execute(`select c.name,c.startyear,c.endyear,r.name 
+            const [associatedcourses]=await con.execute(`select c.name,c.startyear,c.endyear,r.name as rolename 
                                             from users u 
                                             inner join users_roles_courses urc on urc.id_user =u.id
                                             inner join roles r on r.id =urc.id_role
