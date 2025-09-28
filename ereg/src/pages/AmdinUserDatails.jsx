@@ -26,9 +26,8 @@ export default function AmdinUserDetails(){
   useEffect(() => {
     async function fetchData() {
       const data = await fetchHelper('GET',`/getsingleuser/${id}`,token,"none");
-      const allUsers=await  fetchHelper('GET',`/getallusers`,token,"none");
-      if(data.error || allUsers.error) setIsError({error:true,message:"unexpected load error"})
-      console.log("ALL THE USERES",allUsers);
+      if(data.error ) setIsError({error:true,message:"unexpected load error"})
+      console.log(data)
       setUserData(data);
       setassociatedCourse(data.associatedcourses);
     }
@@ -36,18 +35,21 @@ export default function AmdinUserDetails(){
   }, [id,reload]);
 
   const handleDelete=async ()=>{
-    const data = await fetchHelper('DELETE',`/deletecourse/${id}`,token,"none");
+ 
+ 
+    const data = await fetchHelper('DELETE',`/deleteuser/${id}`,token,"none");
+    console.log("DATA",data)
     if(data.error) setIsError({error:true,message:"Errore cancellazione"})
     else {
-      navigate("/admincoursespage")
+      navigate("/adminuserspage")
     }
   }
 
   if(isError?.error)navigate("/errorpage")
-  if(!userData || !allUsers)return(<p>No data found</p>)
+  if(!userData )return(<p>No data found</p>)
   
-  const user = userData?.userData?.[0] || null;
-  const users = userData?.courseUsers || [];
+  const user = userData?.user?.[0] || null;
+  const assCourses = userData?.associatedcourses || [];
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
@@ -55,7 +57,7 @@ export default function AmdinUserDetails(){
       {/* user details */}
       {userData &&       <div className="bg-white rounded-2xl shadow p-6 border border-gray-200">
         <h1 className="text-2xl font-semibold text-gray-900 mb-2">
-        {(userData.firstname  && userData.lastname) ?fullName(userData.firstname,userData.lastname):"N/A"}
+        {(user.firstname  && user.lastname) ? fullName(user.firstname,user.lastname):"N/A"}
         </h1>
         <p className="text-gray-700">Telefono: {user?.phone || "N/A"} anni</p>
         <p className="text-gray-700">Età: {user?.age || "N/A"}</p>
@@ -77,7 +79,7 @@ export default function AmdinUserDetails(){
         </tr>
         </thead>
         <tbody className="divide-y divide-gray-100 bg-white">
-        {users.length === 0 ? (
+        {assCourses.length === 0 ? (
         <tr>
         <td colSpan={4} className="px-4 py-6 text-center text-sm text-gray-500">
         Nessun utente trovato.
@@ -100,10 +102,10 @@ export default function AmdinUserDetails(){
         {deleteOn ? 
         <>
         <Button  styleType={"danger"} onClick={handleDelete}>Conferma</Button>
-        <Button styleType={"standard"} onClick={()=>setDeleteOn((prev)=>!prev)}>Annulla</Button>
+        <Button styleType={"standard"} onClick={()=>setDeleteOn(false)}>Annulla</Button>
         </>
         :<>
-        <Button styleType={"danger"} onClick={()=>setDeleteOn((prev)=>!prev)}>Elimina</Button>
+        <Button styleType={"danger"} onClick={()=>setDeleteOn(true)}>Elimina</Button>
          <Button styleType={"standard"} onClick={()=>navigate(`/addEditCourse/${id}`)}>Modifica</Button>
         </>
         }

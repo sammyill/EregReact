@@ -229,6 +229,7 @@ function initAdminUserRoutes(app) {
      */
     app.delete('/deleteuser/:id', authenticateToken, async (req, res) => {
         let deleteid = req.params.id;
+        
         try {
             //data validation
             const validation = await con.query(`select id from users where id =?`,[deleteid]);
@@ -238,6 +239,7 @@ function initAdminUserRoutes(app) {
             }
 
             //delete user
+            const [predata] =await con.execute ("delete from  users_roles_courses where id_user=?",[deleteid]);
             const [data] = await con.execute(`delete from users where id =?`,[deleteid]);
             res.json({error:false,data:data,message:`UDER DELETED`});
         } catch (err) {
