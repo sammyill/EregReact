@@ -88,8 +88,6 @@ export default function AdminAddEditCourse({}) {
 
   async function handleSubmit(event) {
     event.preventDefault();
-    setelHasHerror({error:true,message:""});
-    setSuccessMsg("");
 
     const payload = {
       name: event.target.courseName?.value,
@@ -98,14 +96,21 @@ export default function AdminAddEditCourse({}) {
       endyear: event.target.courseEndYear?.value,
       status: Number(event.target.courseStatus?.value ?? 1),
     };
+    let data;
+    if(id){
+      console.log("update");
+      payload.id=id;
+      data = await fetchHelper("PATCH", "/updatecourse", token, payload);
+    }else{
+      data = await fetchHelper("POST", "/createcourse", token, payload);
+    }
 
-    const data = await fetchHelper("POST", "/createcourse", token, payload);
     if (data?.error === true) {
       setelHasHerror({error:true,message:"unexpected load error"});
       return;
     }
     navigate("/admincoursespage")
-    setSuccessMsg("Course created successfully.")
+    setSuccessMsg("Operation completed successfully.")
   }
 
   console.log("coursedata",courseData)
@@ -120,7 +125,7 @@ export default function AdminAddEditCourse({}) {
       {(courseData &&isEdit) &&
      
       <FormWrapper
-        confirmButton="Create"
+        confirmButton="Update"
         regetButton="Annulla"
         handleSubmit={handleSubmit}
         handleReget={handleReget}

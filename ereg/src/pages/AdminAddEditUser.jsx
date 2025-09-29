@@ -63,61 +63,63 @@ const statusOptions = [
   { idvalue: 0, labelvalue: "Inactive" },
 ];
 
-const roleValues = [
-  { idvalue: 1, labelvalue: "Studente" },
-  { idvalue: 2, labelvalue: "Professore" },
-  { idvalue: 3, labelvalue: "Coordinatore" },
-  { idvalue: 4, labelvalue: "Super Admin" },
-];
 
 export default function AdminAddEditUser({}) {
   const { token } = useContext(EregContext);
   const [elHasHerror, setelHasHerror] = useState({error:true,message:""});
   const [successMsg, setSuccessMsg] = useState("");
-  const [courseData,setCourseData]=useState(null);
+  const [userData,setUserData]=useState(null);
   const navigate = useNavigate();
   const {id} = useParams()
   const isEdit = id !== undefined;
-  const courseId = id ? Number(id) : null;
+  const userId = id ? Number(id) : null;
   console.log("prova")
 
   useEffect(()=>{
-    async function getCourseData() {
-       const data = await fetchHelper("GET", `/getcourse/${courseId}`, token, "none");
-       console.log("data",data.courseData[0])
+    async function getUserData() {
+        const data = await fetchHelper('GET',`/getsingleuser/${userId}`,token,"none");
+       console.log("data",data.user)
       if(data.error) setelHasHerror({error:true,message:"Errore nel fetch dei dati"})
-      setCourseData(data.courseData[0]);
+      setUserData(data.user);
     }
-    if(isEdit) getCourseData();
+    if(isEdit) getUserData();
   },[])
 
   function handleReget() {
-    navigate("/admincoursespage")
+    navigate("/adminuserspage")
   }
 
   async function handleSubmit(event) {
     event.preventDefault();
-    setelHasHerror({error:true,message:""});
-    setSuccessMsg("");
 
     const payload = {
-      name: event.target.courseName?.value,
-      lenght: event.target.courseLenght?.value,
-      startyear: event.target.courseStartYear?.value,
-      endyear: event.target.courseEndYear?.value,
+      firstname: event.target.firstname?.value,
+      lastname: event.target.lastname?.value,
+      phone: event.target.phone?.value,
+      age: event.target.ege?.value,
+      email: event.target.email?.value,
+      fiscalcode: event.target.fiscalcode?.value,
+      password:event.target.password?.value,
       status: Number(event.target.courseStatus?.value ?? 1),
     };
+    let data;
+    if(id){
+      console.log("update");
+      payload.id=id;
+      data = await fetchHelper("PATCH", `/updateuser/${id}`, token, payload);
+    }else{
+      data = await fetchHelper("POST", "/adduser", token, payload);
+    }
 
-    const data = await fetchHelper("POST", "/createcourse", token, payload);
     if (data?.error === true) {
       setelHasHerror({error:true,message:"unexpected load error"});
       return;
     }
-    navigate("/admincoursespage")
-    setSuccessMsg("Course created successfully.")
+    navigate("/adminuserspage")
+    setSuccessMsg("Operation completed successfully.")
   }
 
-  console.log("coursedata",courseData)
+  console.log("coursedata",userData)
   return (
     <div className="w-full basis-full flex-shrink-0">
       {elHasHerror.error && (
@@ -126,10 +128,10 @@ export default function AdminAddEditUser({}) {
       {successMsg && (
         <div className="text-center text-green-600">{successMsg}</div>
       )}
-      {(courseData &&isEdit) &&
+      {(userData &&isEdit) &&
      
       <FormWrapper
-        confirmButton="Create"
+        confirmButton="Update"
         regetButton="Annulla"
         handleSubmit={handleSubmit}
         handleReget={handleReget}
@@ -138,10 +140,13 @@ export default function AdminAddEditUser({}) {
         courseStartYear="courseStartYear"
         courseEndYear="courseEndYear"
       >
-        <InputField {...{...courseName,startingvalue:courseData?.name ||""}} />
-        <InputField {...{...courseLenght,startingvalue:courseData?.lenght||""}} />
-        <InputField {...{...courseStartYear,startingvalue:courseData?.startyear||""}} />
-        <InputField {...{...courseEndYear,startingvalue:courseData?.endyear||""}} />
+        <InputField {...{...firstname,startingvalue:userData?.firstname ||""}} />
+        <InputField {...{...lastname,startingvalue:userData?.lastname||""}} />
+        <InputField {...{...phone,startingvalue:userData?.phone||""}} />
+        <InputField {...{...age,startingvalue:userData?.age||""}} />
+        <InputField {...{...fiscalcode,startingvalue:userData?.fiscalcode||""}} />
+        <InputField {...{...email,startingvalue:userData?.email||""}} />
+        <InputField {...{...password,startingvalue:userData?.password||""}} />
         <InputSelect
           label="Status"
           id="courseStatus"
@@ -161,10 +166,13 @@ export default function AdminAddEditUser({}) {
         courseStartYear="courseStartYear"
         courseEndYear="courseEndYear"
       >
-        <InputField {...courseName} />
-        <InputField {...courseLenght} />
-        <InputField {...courseStartYear} />
-        <InputField {...courseEndYear} />
+        <InputField {...firstname} />
+        <InputField {...lastname} />
+        <InputField {...phone} />
+        <InputField {...age} />
+        <InputField {...fiscalcode} />
+        <InputField {...email} />
+        <InputField {...password} />
         <InputSelect
           label="Status"
           id="courseStatus"
