@@ -16,46 +16,78 @@ import { useNavigate,useParams  } from 'react-router-dom';
  * IMPORTANT: This version aligns with your FormWrapper pattern — no cross-field client checks.
  * Validation (if any) comes only from each InputField's own constrolExpression, just like ModuleCard.
  */
-const courseName = {
+
+
+const firstname = {
   startingvalue: "",
-  label: "Course Name",
+  label: "Nome",
   type: "text",
-  id: "courseName",
-  name: "courseName",
-  whatIsRight: "Between 5 and 100 characters",
-  constrolExpression: /^.{5,100}$/,
+  id: "firstname",
+  name: "firstname",
+  whatIsRight: "Between 5 and 100 characters,only letters",
+  constrolExpression: /^.{5,100}$/,//mod
 };
 
-// Using InputField (number) like your moduleLenght; allowed values 2 or 3
-const courseLenght = {
-  startingvalue: "2",
-  label: "Length (years)",
-  type: "number",
-  id: "courseLenght",
-  name: "courseLenght",
-  whatIsRight: "Accepted values: 2 or 3",
-  constrolExpression: /^(2|3)$/,
+
+const lastname = {
+  startingvalue: "",
+  label: "Cognome",
+  type: "text",
+  id: "lastname",
+  name: "lastname",
+  whatIsRight: "Between 5 and 100 characters,only letters",
+  constrolExpression: /^.{5,100}$/,//mod
 };
 
-const courseStartYear = {
-  startingvalue: String(new Date().getFullYear()),
-  label: "Start Year",
-  type: "number",
-  id: "courseStartYear",
-  name: "courseStartYear",
-  whatIsRight: "Use a 4-digit year (e.g., 2025)",
-  constrolExpression: /^(19|20)[0-9]{2}$/,
+const phone = {
+  startingvalue: "",
+  label: "Telefono",
+  type: "text",
+  id: "phone",
+  name: "phone",
+  whatIsRight: "insert italia phone number formata",
+  constrolExpression: /^(?:\+?39|0039)?\s?(?:0\d{8,9}|3\d{8,9})$/,
 };
 
-const courseEndYear = {
-  startingvalue: String(new Date().getFullYear() + 1),
-  label: "End Year",
+const age = {
+  startingvalue: 18,
+  label: "Età",
   type: "number",
-  id: "courseEndYear",
-  name: "courseEndYear",
-  whatIsRight: "Use a 4-digit year",
-  constrolExpression: /^(19|20)[0-9]{2}$/,
+  id: "age",
+  name: "age",
+  whatIsRight: "between 5 and 75 year of age",
+  constrolExpression: /^(?:[5-9]|[1-6]\d|7[0-5])$/,
 };
+
+const email = {
+  startingvalue: "",
+  label: "Email",
+  type: "email",
+  id: "email",
+  name: "email",
+  whatIsRight: "insert a valid mail format",
+ constrolExpression: /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/,
+};
+
+const fiscalcode = {
+  startingvalue: "",
+  label: "Codice fiscale",
+  type: "text",
+  id: "fiscalcode",
+  name: "fiscalcode",
+  whatIsRight: "Insert a valid italian fiscal code",
+   constrolExpression: /^[A-Z]{6}\d{2}[A-EHLMPR-T]\d{2}[A-Z]\d{3}[A-Z]$/i,
+};
+
+const password={
+    startingvalue:"", 
+    label:"Password", 
+    type:"password", 
+    id:"password", 
+    name:"password", 
+    whatIsRight:"Min 10 char and  Max 20 char and contains at lease 1 uppercase,1 lovercase,1 number", 
+    constrolExpression:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,20}$/
+}
 
 // Select options — NOT included in FormWrapper's validation keys (same as your newprofessor)
 const statusOptions = [
