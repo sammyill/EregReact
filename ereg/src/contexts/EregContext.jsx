@@ -33,6 +33,7 @@ export  function EregContextProvider({ children }) {
   //on page reload
     useEffect(() => {
     const saved = JSON.parse(localStorage.getItem("ereg"));
+    //aggiungere  controllo timer qui
     if (saved?.token) {
       setContext({
         isLoggedIn: true,
@@ -50,7 +51,9 @@ export  function EregContextProvider({ children }) {
 
   //on logging
   function setEreg(ereg) {
+    const isTimenow=new Date();
     localStorage.setItem("ereg", JSON.stringify(ereg));
+    localStorage.setItem("eregTimer",JSON.stringify({expirationTime:84000,storageData:isTimenow}))
     setContext({
       isLoggedIn: true,
       token: ereg.token,
@@ -88,6 +91,7 @@ export  function EregContextProvider({ children }) {
    //on logging out 
    function logout() {
     localStorage.removeItem("ereg");
+    localStorage.removeItem("eregTimer");
     setContext({
       isLoggedIn: false,
       token: "",
