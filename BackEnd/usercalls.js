@@ -8,9 +8,13 @@ const jwt=require('jsonwebtoken');
 const { path } = require('express/lib/application');
 var jsonParser = bodyParser.json();
 
+//for the frontend
+const tokenDutarion=72000
+
 function generateAccessToken(payload) {
-    return jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: '2629800s' });
+    return jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: "86400s" });
 }
+
 
 
 function authenticateToken(req, res, next) {
@@ -79,7 +83,7 @@ function initUserRoutes(app) {
                 email:data[0].email,
                 status:data[0].status,
                 fiscalcode:data[0].fiscalcode,
-                isAdmin:(data[0]["idrole"]===4)? true:false
+                isAdmin:(data[0]["idrole"]===4)? true:false,
             }
             //generate idcourse,name,role for the front end
             const usercourses=data.map(row=> {
@@ -95,7 +99,7 @@ function initUserRoutes(app) {
             });
           const payload = { username: rqbody.email, userid: data[0]["iduser"], roles: roles,isAdmin:(data[0]["idrole"]===4)? true:false };
           const token = generateAccessToken(payload);
-          res.json({ error: false, errormessage: "", token: token ,user:user,usercourses:usercourses});
+          res.json({ error: false, errormessage: "", token: token ,user:user,usercourses:usercourses, tokenDutarion:tokenDutarion});
         }
       } catch (err) {
         console.log("Login Error: " + err);

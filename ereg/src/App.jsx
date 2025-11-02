@@ -31,7 +31,7 @@ import './App.css'
 
 function AppRoutes() {
   const { isLoggedIn } = useContext(EregContext);
-  console.log(isLoggedIn)
+  console.log(isLoggedIn);
 
   return (
     <>

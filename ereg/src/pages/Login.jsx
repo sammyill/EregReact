@@ -29,7 +29,7 @@ export default function Login(){
             setEreg(data)
             navigate("/")
           }
-          setData(data)
+          setData({...data,password:e.target.password.value})
     } catch (err) {
          console.log(err.message)
     }
