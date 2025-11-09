@@ -26,10 +26,10 @@ export default function Login(){
           if(data.error===false) {
             console.log("fethed data");
             console.log(data)
-            setEreg(data)
+            setEreg({...data,password:e.target.password.value})
             navigate("/")
           }
-          setData({...data,password:e.target.password.value})
+          setData(data)
     } catch (err) {
          console.log(err.message)
     }

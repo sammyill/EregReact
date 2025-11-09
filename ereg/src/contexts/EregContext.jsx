@@ -1,5 +1,5 @@
 import { useState, createContext,useEffect } from "react";
-
+import { fetchHelper } from "../utilities";
 
 function isYoungerThan(pastDate, maxSeconds) {
   const nowMs = Date.now();              
@@ -36,7 +36,6 @@ export  function EregContextProvider({ children }) {
     activeCourseStart:"",
     activeCourseEnd:"",
   });
-  const [timeLeft,setTimeLeft]=useState();
 
   //on page reload
     useEffect(() => {
@@ -60,12 +59,20 @@ export  function EregContextProvider({ children }) {
               activeCourseStart:saved.usercourses?.[0]?.startyear ||"",
               activeCourseEnd:saved.usercourses?.[0]?.endyear ||"",
             });
-          }else{//otherwhise reaquest a new token and new data
-            //fare di nuovo il login qui,prendere i nuovi dati e salvarli su ereg localstorata
-            //dopo implementare anche un timer quando la funzione si apre che data x secondi di tempo rimanenti rilogga
+          }else{
+            const data = await fetchHelper("POST",`/login`,"",{
+              email: saved.user.email,
+              password:saved.password
+            });
+            if(data.error===false) {
+              console.log("fethed data");
+              console.log(data)
+              setEreg({
+                ...data,
+                password:saved.password
+              })
+            }
           }
-         
-          
         }
       }
 
