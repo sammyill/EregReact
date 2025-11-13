@@ -1,5 +1,5 @@
 //Dependencias
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 import { faqs } from "./staticdatas/faqdataset";  
 import { privacyPolicy } from "./staticdatas/policydataset"; 
 import {termsOfService} from "./staticdatas/termservice"
@@ -30,8 +30,30 @@ import AdminAddEditUser from './pages/AdminAddEditUser';
 import './App.css'
 
 function AppRoutes() {
-  const { isLoggedIn } = useContext(EregContext);
+  const { isLoggedIn, lastLogData,tokenDutarion} = useContext(EregContext);
   console.log(isLoggedIn);
+
+    useEffect(()=>{
+      if (!isLoggedIn || !lastLogData || !tokenDutarion) {
+        return;
+      }
+    
+        const last = lastLogData instanceof Date
+          ? lastLogData
+          : new Date(lastLogData);
+        const expiresAtMs = last.getTime() + tokenDutarion * 1000;
+        const nowMs = Date.now();
+        const delay = expiresAtMs - nowMs;
+        if (delay <= 0 || Number.isNaN(delay)) {
+          console.log("token expired");
+          return;
+        }
+        const timeoutId = setTimeout(() => {
+          console.log("token expired");
+        }, delay);
+
+      return () => clearTimeout(timeoutId);
+    },[isLoggedIn,lastLogData,tokenDutarion])
 
   return (
     <>
