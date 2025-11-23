@@ -20,7 +20,8 @@ export const EregContext = createContext({
   activeCourseEnd:"",
   setEreg: () => {},
   setActiveCourse: () => {},
-  logout:()=>{}
+  logout:()=>{},
+  relog:()=>{}
 });
 
 
@@ -84,6 +85,33 @@ export  function EregContextProvider({ children }) {
 
   })
 
+  async function relog(){
+      const saved = JSON.parse(localStorage.getItem("ereg"));
+      const data = await fetchHelper("POST",`/login`,"",{
+              email: saved.user.email,
+              password:saved.password
+      });
+      if(data.error===false) {
+              console.log("fethed data");
+              console.log(data)
+              setEreg({
+                ...data,
+                password:saved.password
+              })
+      }else if(data.error===true){
+        setEreg({
+              isLoggedIn:false,
+              token: "",
+              user: {},
+              usercourses: [],
+              activeCourseRole:0,
+              activeCourseId: 0,
+              activeCourseName:"",
+              activeCourseStart:"",
+              activeCourseEnd:"",
+        })
+      }
+  }
 
 
   //on logging
@@ -144,7 +172,7 @@ export  function EregContextProvider({ children }) {
    }
   console.log(context)
   return (
-    <EregContext.Provider value={{ ...context, setEreg, setActiveCourse,logout }}>
+    <EregContext.Provider value={{ ...context, setEreg, setActiveCourse,logout,relog }}>
       {children}
     </EregContext.Provider>
   );

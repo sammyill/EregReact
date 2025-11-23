@@ -30,7 +30,7 @@ import AdminAddEditUser from './pages/AdminAddEditUser';
 import './App.css'
 
 function AppRoutes() {
-  const { isLoggedIn, lastLogData,tokenDutarion} = useContext(EregContext);
+  const { isLoggedIn, lastLogData,tokenDutarion,relog} = useContext(EregContext);
   console.log(isLoggedIn);
 
     useEffect(()=>{
@@ -46,10 +46,12 @@ function AppRoutes() {
         const delay = expiresAtMs - nowMs;
         if (delay <= 0 || Number.isNaN(delay)) {
           console.log("token expired");
+          relog();
           return;
         }
         const timeoutId = setTimeout(() => {
           console.log("token expired");
+          relog();
         }, delay);
 
       return () => clearTimeout(timeoutId);
