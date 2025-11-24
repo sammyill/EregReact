@@ -2,16 +2,23 @@ import { useState, createContext,useEffect } from "react";
 import { fetchHelper } from "../utilities";
 
 function isYoungerThan(pastDate, maxSeconds) {
-  const nowMs = Date.now();              
-  const pastMs = pastDate.getTime();    
-  const diffSeconds = (nowMs - pastMs) / 1000;
+  if (!pastDate || !maxSeconds) return false;
+
+  const date =
+    pastDate instanceof Date ? pastDate : new Date(pastDate);
+
+  const diffSeconds = (Date.now() - date.getTime()) / 1000;
   return diffSeconds < maxSeconds;
 }
+
 // 1. Create the context with empty default values
 export const EregContext = createContext({
   isLoggedIn: false,
   token: "",
   user: {},
+  password: "",
+  lastLogData: null,
+  tokenDutarion: 0,
   usercourses: [],
   activeCourseRole: 0,
   activeCourseId: 0,
@@ -30,6 +37,9 @@ export  function EregContextProvider({ children }) {
     isLoggedIn:false,
     token: "",
     user: {},
+    password: "",
+    lastLogData: null,
+    tokenDutarion: 0,
     usercourses: [],
     activeCourseRole:0,
     activeCourseId: 0,
@@ -86,7 +96,13 @@ export  function EregContextProvider({ children }) {
   })
 
   async function relog(){
-      const saved = JSON.parse(localStorage.getItem("ereg"));
+        const savedRaw = localStorage.getItem("ereg");
+        if (!savedRaw) {
+          logout(); // or just return
+          return;
+        }
+        const saved = JSON.parse(savedRaw);
+          
       const data = await fetchHelper("POST",`/login`,"",{
               email: saved.user.email,
               password:saved.password
@@ -99,10 +115,14 @@ export  function EregContextProvider({ children }) {
                 password:saved.password
               })
       }else if(data.error===true){
+        localStorage.removeItem("ereg"); 
         setEreg({
               isLoggedIn:false,
               token: "",
               user: {},
+              password: "",
+              lastLogData: null,
+              tokenDutarion: 0,
               usercourses: [],
               activeCourseRole:0,
               activeCourseId: 0,
@@ -139,7 +159,8 @@ export  function EregContextProvider({ children }) {
   function setActiveCourse(courseId) {
     console.log(`al context è arrivato questo valore ${courseId}`)
     const activeCourse=context.usercourses.find((course)=>course.idcourse===courseId);
-    console.log(activeCourse)
+     if (!activeCourse) return;
+    console.log("activeCourse",activeCourse)
     setContext((prev) => {
         console.log("previous values")
         console.log(prev)

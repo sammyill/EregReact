@@ -55,7 +55,7 @@ function AppRoutes() {
         }, delay);
 
       return () => clearTimeout(timeoutId);
-    },[isLoggedIn,lastLogData,tokenDutarion])
+    },[isLoggedIn,lastLogData,tokenDutarion,relog])
 
   return (
     <>
